@@ -1,0 +1,57 @@
+@use '../global//mixins' as *;
+
+.header {
+  &__wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+  }
+
+  &__logo {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #b4387a;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+    gap: 40px;
+  }
+
+  &__link {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #1d1929;
+  }
+
+  &__nav {
+    @include vp-920 {
+      display: none;
+    }
+  }
+
+  &__btn {
+    background-color: #003cff;
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    cursor: pointer;
+
+    @include vp-920 {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,47 @@
+@use '../global//mixins' as *;
+
+.burger {
+  z-index: 12;
+  display: flex;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  height: 32px;
+  width: 32px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  display: none;
+
+  @include vp-920 {
+    display: block;
+  }
+
+  &__line {
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background-color: #003cff;
+    transition: all 0.3s ease-in-out;
+    left: 0;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 2px;
+      background-color: #003cff;
+      left: 0;
+      transition: all 0.3s ease-in-out;
+    }
+
+    &::before {
+      transform: translateY(-7px);
+    }
+    &::after {
+      transform: translateY(7px);
+    }
+  }
+}
