@@ -1,12 +1,14 @@
 import React from 'react';
 
+import logoImg from '@/assets/img/logo-footer.png';
+
 const Footer: React.FC = () => {
   return (
     <footer className='footer'>
       <div className='container'>
         <div className='footer__top'>
           <a href='#' className='footer__logo-link'>
-            <img src='img/logo-footer.png' alt='логотип neoflex' />
+            <img src={logoImg} alt='логотип neoflex' />
           </a>
 
           <div className='footer__top-inner'>

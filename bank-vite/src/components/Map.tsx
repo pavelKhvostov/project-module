@@ -1,5 +1,7 @@
 import React from 'react';
 
+import mapSvg from '@/assets/img/map-icon.svg';
+
 const Map: React.FC = () => {
   return (
     <section className='map'>
@@ -8,9 +10,7 @@ const Map: React.FC = () => {
         <span className='map__text'>
           Withdraw and transfer money online through our application
         </span>
-        <svg className='map__icon' width='1060' height='537' aria-hidden='true'>
-          <use xlinkHref='img/sprite.svg#map-icon'></use>
-        </svg>
+        <img className='map__icon' src={mapSvg} width='1060' height='537' alt='изображение карты' />
       </div>
     </section>
   );

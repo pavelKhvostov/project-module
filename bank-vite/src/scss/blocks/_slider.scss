@@ -75,14 +75,14 @@
       background-color: #003cff;
     }
 
-    &:hover .slider__icon,
-    &:focus-visible .slider__icon {
-      color: #fff;
+    &:hover .slider__icon path,
+    &:focus-visible .slider__icon path {
+      stroke: #fff;
     }
   }
 
-  &__icon {
-    transition: color 0.2s ease-in-out;
+  &__icon path {
+    transition: stroke 0.2s ease-in-out;
   }
 
   &__bottom {
