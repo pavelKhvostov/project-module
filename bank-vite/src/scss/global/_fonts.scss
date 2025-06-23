@@ -1,0 +1,49 @@
+@font-face {
+  font-family: 'Ubuntu';
+  src:
+    url('@/assets/fonts/Ubuntu.woff2') format('woff2'),
+    url('@/assets/fonts/Ubuntu.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src:
+    url('@/assets/fonts/Rubik-Medium.woff2') format('woff2'),
+    url('@/assets/fonts/Rubik-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src:
+    url('@/assets/fonts/Rubik-Regular.woff2') format('woff2'),
+    url('@/assets/fonts/Rubik-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src:
+    url('@/assets/fonts/Ubuntu-Medium.woff2') format('woff2'),
+    url('@/assets/fonts/Ubuntu-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src:
+    url('@/assets/fonts/Ubuntu-Bold.woff2') format('woff2'),
+    url('@/assets/fonts/Ubuntu-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}

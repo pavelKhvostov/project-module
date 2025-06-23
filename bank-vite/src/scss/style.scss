@@ -1,0 +1,23 @@
+/* Global */
+/* ------------------------------------ */
+@use 'global/normalize';
+@use 'global/variables' as *;
+@use 'global/fonts';
+@use 'global/mixins' as *;
+@use 'global/reboot';
+@use 'global/container';
+@use 'global/visually-hidden';
+
+/* Blocks */
+/* ------------------------------------ */
+@use 'blocks/header';
+@use 'blocks/burger';
+@use 'blocks/btn';
+@use 'blocks/hero';
+@use 'blocks/services';
+@use 'blocks/map';
+@use 'blocks/news';
+@use 'blocks/slider';
+@use 'blocks/support';
+@use 'blocks/form-subscribe';
+@use 'blocks/footer';

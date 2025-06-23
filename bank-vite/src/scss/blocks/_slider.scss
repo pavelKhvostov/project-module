@@ -1,0 +1,106 @@
+@use '../global//mixins' as *;
+
+.slider {
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    gap: 80px;
+    display: flex;
+  }
+
+  &__link {
+    background: #ffffff;
+    box-shadow:
+      0px 0px 4px rgba(0, 0, 0, 0.08),
+      0px 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 28px;
+    width: 100%;
+    padding: 32px;
+    min-height: 448px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  &__title {
+    margin: 0;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+    color: #000000;
+  }
+
+  &__img {
+    margin: 0 0 32px;
+  }
+
+  &__window {
+    overflow: hidden;
+    margin: 0 0 48px;
+    padding: 3px;
+  }
+
+  &__track {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+    gap: 80px;
+    transition: transform 0.4s ease;
+
+    @include vp-1110 {
+      gap: 40px;
+    }
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #003cff;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+
+    &--next {
+      transform: rotate(180deg);
+    }
+
+    &:hover,
+    &:focus-visible {
+      background-color: #003cff;
+    }
+
+    &:hover .slider__icon,
+    &:focus-visible .slider__icon {
+      color: #fff;
+    }
+  }
+
+  &__icon {
+    transition: color 0.2s ease-in-out;
+  }
+
+  &__bottom {
+    display: flex;
+    justify-content: end;
+    gap: 20px;
+  }
+}
+
+.slide {
+  flex: 0 0 calc(100% / 3.75);
+  max-width: 320px;
+
+  @include vp-1110 {
+    flex: 0 0 calc(100% / 2);
+  }
+
+  @include vp-600 {
+    flex: 0 0 calc(100% / 1);
+  }
+}
