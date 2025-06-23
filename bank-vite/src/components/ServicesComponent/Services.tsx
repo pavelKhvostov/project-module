@@ -5,6 +5,8 @@ import pepleSvg from '@/assets/img/services-svg-hero.svg';
 import checkSvg from '@/assets/img/checked.svg';
 import banckSvg from '@/assets/img/bank-icon.svg';
 
+import './_services.scss';
+
 type TcurrencyProp = {
   code: string;
   value: number;

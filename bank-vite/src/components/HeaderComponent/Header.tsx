@@ -1,4 +1,8 @@
 import React from 'react';
+import Button from '../ButtonComponent/Button';
+import BurgerButton from '../BurgerComponent/Burger';
+
+import './_header.scss';
 
 const Header: React.FC = () => {
   return (
@@ -32,12 +36,9 @@ const Header: React.FC = () => {
               </li>
             </ul>
           </nav>
-          <button type='button' className='header__btn btn'>
-            Online Bank
-          </button>
-          <button type='button' aria-label='кнопка открыть меню' className='burger'>
-            <span className='burger__line'></span>
-          </button>
+
+          <Button className='header__btn'>Online Bank</Button>
+          <BurgerButton />
         </div>
       </div>
     </header>
