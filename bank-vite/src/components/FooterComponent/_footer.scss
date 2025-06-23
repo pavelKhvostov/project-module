@@ -44,6 +44,10 @@
     gap: 32px;
     flex-wrap: wrap;
     width: 100%;
+
+    @include vp-600 {
+      gap: 20px;
+    }
   }
 
   &__link {

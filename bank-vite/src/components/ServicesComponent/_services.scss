@@ -11,6 +11,7 @@
 
     @include vp-920 {
       flex-direction: column;
+      align-items: center;
     }
   }
 
@@ -23,6 +24,10 @@
 
   &__right {
     padding-top: 74px;
+
+    @include vp-920 {
+      text-align: center;
+    }
   }
 
   &__title {
@@ -50,6 +55,11 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-width: 220px;
+
+    @include vp-920 {
+      margin: 0 auto;
+    }
   }
 
   &__inner {
@@ -109,6 +119,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 32px;
+
+    @include vp-600 {
+      justify-content: center;
+    }
   }
 
   &__code {
@@ -136,17 +150,27 @@
     color: #ffffff;
   }
 
+  &__curr-left-inner {
+    @include vp-600 {
+      text-align: center;
+    }
+  }
+
   &__curr-right-inner {
     display: flex;
     flex-direction: column;
     gap: 79px;
     align-items: end;
+
+    @include vp-600 {
+      gap: 40px;
+      align-items: center;
+    }
   }
 
   &__icon:first-of-type {
     @include vp-600 {
       max-width: 350px;
-      width: 100%;
     }
   }
 
