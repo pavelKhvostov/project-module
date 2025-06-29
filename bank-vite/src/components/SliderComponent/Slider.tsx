@@ -1,37 +1,98 @@
-import React from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
 import './_slider.scss';
+import { IArticle } from '../NewsComponent/News';
 
-type TSlide = {
-  id: number;
-  img: string;
-  title: string;
-  desc: string;
-};
+interface ISliderProps {
+  readonly articles: IArticle[];
+}
 
-type TSliderProps = {
-  slides: TSlide[];
-};
+const Slider: React.FC<ISliderProps> = ({ articles }) => {
+  const trackRef = useRef<HTMLUListElement>(null);
 
-const Slider: React.FC<TSliderProps> = ({ slides }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visibleSlides, setVisibleSlides] = useState(1);
+
+  // Функция для установки числа видимых слайдов в зависимости от ширины окна
+  const updateVisibleSlides = () => {
+    const width = window.innerWidth;
+    const slides = width <= 500 ? 1 : width <= 800 ? 2 : 3;
+    setVisibleSlides(slides);
+    document.documentElement.style.setProperty('--visible-slides', slides.toString());
+  };
+
+  useEffect(() => {
+    updateVisibleSlides();
+    window.addEventListener('resize', updateVisibleSlides);
+    return () => window.removeEventListener('resize', updateVisibleSlides);
+  }, []);
+
+  const maxIndex = Math.max(0, articles.length - visibleSlides);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    const slideWidthPercent = 100 / visibleSlides;
+    if (track) {
+      track.style.transform = `translateX(-${currentIndex * slideWidthPercent}%)`;
+    }
+  }, [currentIndex, visibleSlides]);
+
+  // Деактивация кнопок при достижении границ
+  const isPrevDisabled = currentIndex === 0;
+  const isNextDisabled = currentIndex >= maxIndex;
+
+  // Swipe обработчики
+  useEffect(() => {
+    let startX = 0;
+    let endX = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      endX = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+      const swipeDistance = endX - startX;
+      const threshold = 50;
+      if (swipeDistance > threshold && !isPrevDisabled) {
+        setCurrentIndex((prev) => Math.max(prev - 1, 0));
+      } else if (swipeDistance < -threshold && !isNextDisabled) {
+        setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
+      }
+    };
+
+    const track = trackRef.current;
+    track?.addEventListener('touchstart', handleTouchStart);
+    track?.addEventListener('touchmove', handleTouchMove);
+    track?.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      track?.removeEventListener('touchstart', handleTouchStart);
+      track?.removeEventListener('touchmove', handleTouchMove);
+      track?.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isPrevDisabled, isNextDisabled, maxIndex]);
+
   return (
     <div className='slider'>
       <div className='slider__window'>
-        <ul className='slider__track'>
-          {slides.map((item) => (
-            <li key={item.id} className='slider__item slide'>
-              <a href='#' className='slider__link'>
+        <ul className='slider__track' ref={trackRef}>
+          {articles.map((item) => (
+            <li key={item.url} className='slider__item slide'>
+              <a href={item.url} target='_blank' rel='noreferrer' className='slider__link'>
                 <div className='slider__wrap'>
                   <img
                     className='slider__img'
-                    src={item.img}
+                    src={item.urlToImage}
                     width={256}
                     height={120}
-                    alt='изображение новости'
+                    alt='новость'
                   />
                   <h3 className='slider__title'>{item.title}</h3>
                 </div>
-                <p className='slider__descr'>{item.desc}</p>
+                <p className='slider__descr'>{item.description}</p>
               </a>
             </li>
           ))}
@@ -39,7 +100,13 @@ const Slider: React.FC<TSliderProps> = ({ slides }) => {
       </div>
 
       <div className='slider__bottom'>
-        <button type='button' aria-label='кнопка предыдущего слайда' className='slider__btn'>
+        <button
+          type='button'
+          aria-label='предыдущий слайд'
+          className='slider__btn'
+          onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
+          disabled={isPrevDisabled}
+        >
           <svg
             className='slider__icon'
             width='25'
@@ -57,8 +124,10 @@ const Slider: React.FC<TSliderProps> = ({ slides }) => {
 
         <button
           type='button'
-          aria-label='кнопка следующего слайда'
+          aria-label='следующий слайд'
           className='slider__btn slider__btn--next'
+          onClick={() => setCurrentIndex((prev) => Math.min(prev + 1, maxIndex))}
+          disabled={isNextDisabled}
         >
           <svg
             className='slider__icon'

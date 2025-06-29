@@ -114,7 +114,7 @@
   &__curr-list {
     margin: 0 0 51px;
     padding: 0;
-    max-width: 430px;
+    max-width: 440px;
     list-style-type: none;
     display: flex;
     flex-wrap: wrap;
@@ -179,5 +179,11 @@
     font-size: 16px;
     line-height: 50px;
     color: #000000;
+  }
+
+  &__loading {
+    margin: 0 0 20px;
+    font-size: 24px;
+    line-height: 32px;
   }
 }

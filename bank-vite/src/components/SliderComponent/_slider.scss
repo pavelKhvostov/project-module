@@ -18,6 +18,7 @@
     width: 100%;
     padding: 32px;
     min-height: 448px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -79,6 +80,15 @@
     &:focus-visible .slider__icon path {
       stroke: #fff;
     }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &:disabled:hover,
+    &:disabled:focus-visible {
+      background-color: #8b8b8b;
+    }
   }
 
   &__icon path {
@@ -93,14 +103,15 @@
 }
 
 .slide {
-  flex: 0 0 calc(100% / 3.75);
+  flex: 0 0 calc(100% / var(--visible-slides));
+
   max-width: 320px;
 
-  @include vp-1110 {
-    flex: 0 0 calc(100% / 2);
-  }
+  // @include vp-1110 {
+  //   flex: 0 0 calc(100% / 2);
+  // }
 
-  @include vp-600 {
-    flex: 0 0 calc(100% / 1);
-  }
+  // @include vp-600 {
+  //   flex: 0 0 calc(100% / 1);
+  // }
 }
