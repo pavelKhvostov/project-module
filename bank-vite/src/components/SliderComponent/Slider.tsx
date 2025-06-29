@@ -47,7 +47,6 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
   const isPrevDisabled = currentIndex === 0;
   const isNextDisabled = currentIndex >= maxIndex;
 
-  // Swipe обработчики
   useEffect(() => {
     let startX = 0;
     let endX = 0;
