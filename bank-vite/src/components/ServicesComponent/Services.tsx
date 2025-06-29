@@ -7,85 +7,85 @@ import banckSvg from '@/assets/img/bank-icon.svg';
 
 import './_services.scss';
 
-// type TCurrencyCode = 'USD' | 'EUR' | 'CNY' | 'CHF' | 'TRY' | 'JPY';
+type TCurrencyCode = 'USD' | 'EUR' | 'CNY' | 'CHF' | 'TRY' | 'JPY';
 
-// interface ICurrencyRate {
-//   code: TCurrencyCode;
-//   rate: number;
-// }
+interface ICurrencyRate {
+  code: TCurrencyCode;
+  rate: number;
+}
 
-// const CURRENCY_NAMES: Record<TCurrencyCode, string> = {
-//   USD: 'USD',
-//   EUR: 'EUR',
-//   CNY: 'CNY',
-//   CHF: 'CHF',
-//   TRY: 'TRY',
-//   JPY: 'JPY',
-// };
+const CURRENCY_NAMES: Record<TCurrencyCode, string> = {
+  USD: 'USD',
+  EUR: 'EUR',
+  CNY: 'CNY',
+  CHF: 'CHF',
+  TRY: 'TRY',
+  JPY: 'JPY',
+};
 
-// const ACCESS_KEY = 'a6c1c3fef84cf28debd364b2';
+const ACCESS_KEY = 'a6c1c3fef84cf28debd364b2';
 
-// // переиспользуемая функция получения валют
-// const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
-//   const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
-//   try {
-//     const response = await axios.get(url);
-//     const rate = response.data.conversion_rate;
-//     if (rate) {
-//       return {
-//         code,
-//         rate: Number(rate.toFixed(2)),
-//       };
-//     }
-//     return null;
-//   } catch (error) {
-//     console.error(`Ошибка при получении курса ${code}:`, error);
-//     return null;
-//   }
-// };
+// переиспользуемая функция получения валют
+const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
+  const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
+  try {
+    const response = await axios.get(url);
+    const rate = response.data.conversion_rate;
+    if (rate) {
+      return {
+        code,
+        rate: Number(rate.toFixed(2)),
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`Ошибка при получении курса ${code}:`, error);
+    return null;
+  }
+};
 
-// const fetchAllRates = async (): Promise<ICurrencyRate[]> => {
-//   const codes = Object.keys(CURRENCY_NAMES) as TCurrencyCode[];
-//   const result: ICurrencyRate[] = [];
+const fetchAllRates = async (): Promise<ICurrencyRate[]> => {
+  const codes = Object.keys(CURRENCY_NAMES) as TCurrencyCode[];
+  const result: ICurrencyRate[] = [];
 
-//   for (const code of codes) {
-//     const data = await getExchangeRate(code);
-//     if (data) {
-//       result.push(data);
-//     }
-//   }
+  for (const code of codes) {
+    const data = await getExchangeRate(code);
+    if (data) {
+      result.push(data);
+    }
+  }
 
-//   return result;
-// };
+  return result;
+};
 
 const Services: React.FC = () => {
-  // const [rates, setRates] = useState<ICurrencyRate[]>([]);
-  // const [isLoading, setIsLoading] = useState(true);
+  const [rates, setRates] = useState<ICurrencyRate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // const currentDate = new Date();
-  // const formattedDate = currentDate.toLocaleDateString('ru-RU', {
-  //   day: '2-digit',
-  //   month: '2-digit',
-  //   year: 'numeric',
-  // });
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 
-  // useEffect(() => {
-  //   const loadRates = async () => {
-  //     setIsLoading(true);
-  //     const data = await fetchAllRates();
-  //     setRates(data);
-  //     setIsLoading(false);
-  //   };
+  useEffect(() => {
+    const loadRates = async () => {
+      setIsLoading(true);
+      const data = await fetchAllRates();
+      setRates(data);
+      setIsLoading(false);
+    };
 
-  //   loadRates();
-  //   const interval = setInterval(loadRates, 900000); // каждые 15 минут
+    loadRates();
+    const interval = setInterval(loadRates, 900000); // каждые 15 минут
 
-  //   return () => clearInterval(interval);
-  // }, []);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className='services'>
-      {/* <div className='container'>
+      <div className='container'>
         <div className='services__wrap'>
           <div className='services__left'>
             <img className='services__icon' src={pepleSvg} width='509' height='415' alt='...' />
@@ -151,7 +151,7 @@ const Services: React.FC = () => {
             <img className='services__icon' src={banckSvg} width='120' height='113' alt='...' />
           </div>
         </div>
-      </div> */}
+      </div>
     </section>
   );
 };

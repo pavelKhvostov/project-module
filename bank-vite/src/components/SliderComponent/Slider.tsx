@@ -26,13 +26,20 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
     return () => window.removeEventListener('resize', updateVisibleSlides);
   }, []);
 
-  const maxIndex = Math.max(0, articles.length - visibleSlides);
+  const maxIndex = Math.max(0, articles.length - visibleSlides - 2);
 
   useEffect(() => {
     const track = trackRef.current;
-    const slideWidthPercent = 100 / visibleSlides;
+
+    const slideEl = track?.children[0] as HTMLElement;
+    const style = window.getComputedStyle(slideEl);
+    const marginRight = parseFloat(style.marginRight);
+    const shift = 180 + slideEl.offsetWidth + marginRight;
+
+    console.log(shift);
+
     if (track) {
-      track.style.transform = `translateX(-${currentIndex * slideWidthPercent}%)`;
+      track.style.transform = `translateX(-${currentIndex * shift}px)`;
     }
   }, [currentIndex, visibleSlides]);
 
