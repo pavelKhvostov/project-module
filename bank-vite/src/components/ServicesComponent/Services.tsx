@@ -23,9 +23,9 @@ const CURRENCY_NAMES: Record<TCurrencyCode, string> = {
   JPY: 'JPY',
 };
 
-const ACCESS_KEY = 'a6c1c3fef84cf28debd364b2';
+const ACCESS_KEY = import.meta.env.VITE_SERVICES_API_KEY;
 
-// переиспользуемая функция получения валют
+// Функция получения курса одной валюты
 const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
   const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
   try {
@@ -44,8 +44,10 @@ const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | nul
   }
 };
 
-const fetchAllRates = async (): Promise<ICurrencyRate[]> => {
-  const codes = Object.keys(CURRENCY_NAMES) as TCurrencyCode[];
+// Универсальная функция получения курсов для переданного списка валют
+const fetchAllRates = async (
+  codes: TCurrencyCode[] = Object.keys(CURRENCY_NAMES) as TCurrencyCode[],
+): Promise<ICurrencyRate[]> => {
   const result: ICurrencyRate[] = [];
 
   for (const code of codes) {
@@ -58,7 +60,11 @@ const fetchAllRates = async (): Promise<ICurrencyRate[]> => {
   return result;
 };
 
-const Services: React.FC = () => {
+interface ServicesProps {
+  currencyCodes?: TCurrencyCode[];
+}
+
+const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
   const [rates, setRates] = useState<ICurrencyRate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,16 +78,16 @@ const Services: React.FC = () => {
   useEffect(() => {
     const loadRates = async () => {
       setIsLoading(true);
-      const data = await fetchAllRates();
+      const data = await fetchAllRates(currencyCodes);
       setRates(data);
       setIsLoading(false);
     };
 
     loadRates();
-    const interval = setInterval(loadRates, 900000); // каждые 15 минут
+    const interval = setInterval(loadRates, 1000 * 60 * 15); // обновлять каждые 15 минут
 
     return () => clearInterval(interval);
-  }, []);
+  }, [currencyCodes]);
 
   return (
     <section className='services'>
@@ -132,8 +138,8 @@ const Services: React.FC = () => {
               <p className='services__loading'>loading...</p>
             ) : (
               <ul className='services__curr-list'>
-                {rates.map((item, i) => (
-                  <li key={i} className='services__item'>
+                {rates.map((item) => (
+                  <li key={item.code} className='services__item'>
                     <span className='services__code'>{item.code}: </span>
                     <span className='services__val'>{item.rate}</span>
                   </li>

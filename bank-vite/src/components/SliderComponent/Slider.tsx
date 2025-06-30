@@ -8,11 +8,17 @@ interface ISliderProps {
 
 const Slider: React.FC<ISliderProps> = ({ articles }) => {
   const trackRef = useRef<HTMLUListElement>(null);
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleSlides, setVisibleSlides] = useState(1);
 
-  // Функция для установки числа видимых слайдов в зависимости от ширины окна
+  // Заглушка при отсутствии картинки
+  const fallbackImage = '/fallback-image.jpg';
+
+  // Фильтрация валидных изображений
+  const filteredArticles = articles.filter(
+    (item) => typeof item.urlToImage === 'string' && item.urlToImage.startsWith('http'),
+  );
+
   const updateVisibleSlides = () => {
     const width = window.innerWidth;
     const slides = width <= 500 ? 1 : width <= 800 ? 2 : 3;
@@ -26,24 +32,26 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
     return () => window.removeEventListener('resize', updateVisibleSlides);
   }, []);
 
-  const maxIndex = Math.max(0, articles.length - visibleSlides - 2);
+  const maxIndex = Math.max(0, filteredArticles.length - visibleSlides);
 
   useEffect(() => {
     const track = trackRef.current;
+    if (!track) return;
 
-    const slideEl = track?.children[0] as HTMLElement;
-    const style = window.getComputedStyle(slideEl);
-    const marginRight = parseFloat(style.marginRight);
-    const shift = 180 + slideEl.offsetWidth + marginRight;
+    const slideEl = track.children[0] as HTMLElement;
+    if (!slideEl) return;
 
-    console.log(shift);
+    const slideWidth = slideEl.offsetWidth;
+    const trackStyles = window.getComputedStyle(track);
+    const gapValue = trackStyles.gap || trackStyles.columnGap || '0px';
+    const gap = parseFloat(gapValue);
 
-    if (track) {
-      track.style.transform = `translateX(-${currentIndex * shift}px)`;
-    }
-  }, [currentIndex, visibleSlides]);
+    const safeIndex = Math.min(currentIndex, maxIndex);
+    const totalShift = safeIndex * (slideWidth + gap);
 
-  // Деактивация кнопок при достижении границ
+    track.style.transform = `translateX(-${totalShift}px)`;
+  }, [currentIndex, visibleSlides, filteredArticles.length]);
+
   const isPrevDisabled = currentIndex === 0;
   const isNextDisabled = currentIndex >= maxIndex;
 
@@ -85,7 +93,7 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
     <div className='slider'>
       <div className='slider__window'>
         <ul className='slider__track' ref={trackRef}>
-          {articles.map((item) => (
+          {filteredArticles.map((item) => (
             <li key={item.url} className='slider__item slide'>
               <a href={item.url} target='_blank' rel='noreferrer' className='slider__link'>
                 <div className='slider__wrap'>
@@ -95,6 +103,11 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
                     width={256}
                     height={120}
                     alt='новость'
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.onerror = null;
+                      target.src = fallbackImage;
+                    }}
                   />
                   <h3 className='slider__title'>{item.title}</h3>
                 </div>
@@ -113,14 +126,7 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
           onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
           disabled={isPrevDisabled}
         >
-          <svg
-            className='slider__icon'
-            width='25'
-            height='26'
-            viewBox='0 0 25 26'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
+          <svg className='slider__icon' width='25' height='26' viewBox='0 0 25 26' fill='none'>
             <path
               d='M25 17H9.84211V24.3914C9.84211 24.5845 9.59562 24.6655 9.48109 24.5101L1 13L9.48109 1.48994C9.59562 1.33452 9.84211 1.41552 9.84211 1.60858V9H25'
               stroke='#222222'
@@ -135,14 +141,7 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
           onClick={() => setCurrentIndex((prev) => Math.min(prev + 1, maxIndex))}
           disabled={isNextDisabled}
         >
-          <svg
-            className='slider__icon'
-            width='25'
-            height='26'
-            viewBox='0 0 25 26'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
+          <svg className='slider__icon' width='25' height='26' viewBox='0 0 25 26' fill='none'>
             <path
               d='M25 17H9.84211V24.3914C9.84211 24.5845 9.59562 24.6655 9.48109 24.5101L1 13L9.48109 1.48994C9.59562 1.33452 9.84211 1.41552 9.84211 1.60858V9H25'
               stroke='#222222'

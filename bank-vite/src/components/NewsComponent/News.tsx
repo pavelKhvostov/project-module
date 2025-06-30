@@ -12,25 +12,50 @@ export interface IArticle {
   description: string;
 }
 
-const API_KEY = '2c28465154834c0f918c1bb4d946819b';
-const API_URL = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=${API_KEY}`;
+const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+
+const PAGE_SIZE = 20;
 
 const News: React.FC = () => {
   const [articles, setArticles] = useState<IArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchPage = async (page: number) => {
+    const url = `https://newsapi.org/v2/top-headlines?country=us&category=business&pageSize=${PAGE_SIZE}&page=${page}&apiKey=${API_KEY}`;
+    const response = await axios.get(url);
+    return response.data;
+  };
+
   useEffect(() => {
     const fetchNews = async () => {
+      setIsLoading(true);
       try {
-        const response = await axios.get(API_URL);
-        const filteredArticles = (response.data.articles as IArticle[])
-          .filter(
+        const firstPageData = await fetchPage(1);
+
+        // Фильтруем статьи по описанию и валидности urlToImage (начинается с http/https)
+        let filteredArticles = (firstPageData.articles as IArticle[]).filter(
+          (article) =>
+            article.description &&
+            !/<[^>]*>/g.test(article.description) &&
+            typeof article.urlToImage === 'string' &&
+            /^https?:\/\//.test(article.urlToImage),
+        );
+
+        if (
+          filteredArticles.length < PAGE_SIZE &&
+          firstPageData.totalResults > filteredArticles.length
+        ) {
+          const secondPageData = await fetchPage(2);
+          const secondPageFiltered = (secondPageData.articles as IArticle[]).filter(
             (article) =>
-              article.urlToImage?.startsWith('http') &&
               article.description &&
-              !/<[^>]*>/g.test(article.description),
-          )
-          .slice(0, 20);
+              !/<[^>]*>/g.test(article.description) &&
+              typeof article.urlToImage === 'string' &&
+              /^https?:\/\//.test(article.urlToImage),
+          );
+          filteredArticles = [...filteredArticles, ...secondPageFiltered];
+        }
+
         setArticles(filteredArticles);
       } catch (error) {
         console.error('Ошибка при загрузке новостей:', error);
@@ -55,4 +80,5 @@ const News: React.FC = () => {
     </section>
   );
 };
+
 export default News;
