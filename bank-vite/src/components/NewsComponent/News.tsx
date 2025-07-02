@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import './_news.scss';
-
 import Slider from '../SliderComponent/Slider';
 
 export interface IArticle {
@@ -13,8 +12,18 @@ export interface IArticle {
 }
 
 const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
-
 const PAGE_SIZE = 20;
+
+//Утилита для проверки валидности изображения
+const isValidImageUrl = (url: string | null | undefined): boolean => {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return /^https?:\/\//.test(url) && /\.(jpg|jpeg|png|webp|gif)$/i.test(parsed.pathname);
+  } catch {
+    return false;
+  }
+};
 
 const News: React.FC = () => {
   const [articles, setArticles] = useState<IArticle[]>([]);
@@ -32,13 +41,11 @@ const News: React.FC = () => {
       try {
         const firstPageData = await fetchPage(1);
 
-        // Фильтруем статьи по описанию и валидности urlToImage (начинается с http/https)
         let filteredArticles = (firstPageData.articles as IArticle[]).filter(
           (article) =>
             article.description &&
-            !/<[^>]*>/g.test(article.description) &&
-            typeof article.urlToImage === 'string' &&
-            /^https?:\/\//.test(article.urlToImage),
+            !/<[^>]*>/g.test(article.description) && // если нужно убрать HTML
+            isValidImageUrl(article.urlToImage),
         );
 
         if (
@@ -50,8 +57,7 @@ const News: React.FC = () => {
             (article) =>
               article.description &&
               !/<[^>]*>/g.test(article.description) &&
-              typeof article.urlToImage === 'string' &&
-              /^https?:\/\//.test(article.urlToImage),
+              isValidImageUrl(article.urlToImage),
           );
           filteredArticles = [...filteredArticles, ...secondPageFiltered];
         }
@@ -75,7 +81,8 @@ const News: React.FC = () => {
           We update the news feed every 15 minutes. You can learn more by clicking on the news you
           are interested in.
         </span>
-        {isLoading ? <p className='news_loading'>loading...</p> : <Slider articles={articles} />}
+
+        {isLoading ? <p className='news_loading'>Loading...</p> : <Slider articles={articles} />}
       </div>
     </section>
   );

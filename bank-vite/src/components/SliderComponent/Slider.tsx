@@ -12,12 +12,7 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
   const [visibleSlides, setVisibleSlides] = useState(1);
 
   // Заглушка при отсутствии картинки
-  const fallbackImage = '/fallback-image.jpg';
-
-  // Фильтрация валидных изображений
-  const filteredArticles = articles.filter(
-    (item) => typeof item.urlToImage === 'string' && item.urlToImage.startsWith('http'),
-  );
+  const fallbackImage = 'http://dummyimage.com/120';
 
   const updateVisibleSlides = () => {
     const width = window.innerWidth;
@@ -32,7 +27,7 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
     return () => window.removeEventListener('resize', updateVisibleSlides);
   }, []);
 
-  const maxIndex = Math.max(0, filteredArticles.length - visibleSlides);
+  const maxIndex = Math.max(0, articles.length - visibleSlides);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -50,7 +45,7 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
     const totalShift = safeIndex * (slideWidth + gap);
 
     track.style.transform = `translateX(-${totalShift}px)`;
-  }, [currentIndex, visibleSlides, filteredArticles.length]);
+  }, [currentIndex, visibleSlides, articles.length]);
 
   const isPrevDisabled = currentIndex === 0;
   const isNextDisabled = currentIndex >= maxIndex;
@@ -93,7 +88,7 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
     <div className='slider'>
       <div className='slider__window'>
         <ul className='slider__track' ref={trackRef}>
-          {filteredArticles.map((item) => (
+          {articles.map((item) => (
             <li key={item.url} className='slider__item slide'>
               <a href={item.url} target='_blank' rel='noreferrer' className='slider__link'>
                 <div className='slider__wrap'>
