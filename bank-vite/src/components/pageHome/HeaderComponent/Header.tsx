@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../ButtonComponent/Button';
+import Button from '../../ui/ButtonComponent/Button';
 import BurgerButton from '../BurgerComponent/Burger';
 import { Link } from 'react-router-dom';
 

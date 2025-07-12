@@ -30,6 +30,12 @@
     line-height: 112%;
     letter-spacing: 0.02em;
     color: #1d1929;
+
+    &:hover,
+    &:focus-visible,
+    &:active {
+      color: #b2a35f;
+    }
   }
 
   &__nav {

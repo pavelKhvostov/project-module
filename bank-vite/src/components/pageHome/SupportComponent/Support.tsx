@@ -1,6 +1,6 @@
 import React from 'react';
 
-import SubscribForm from '@/components/SubscribeFormComponents/SubscribeFrom';
+import SubscribForm from '@/components/pageHome/SubscribeFormComponents/SubscribeFrom';
 
 import './_support.scss';
 

@@ -1,0 +1,76 @@
+.credit-hero {
+  margin: 0 0 48px;
+  padding-top: 20px;
+
+  &__wrap {
+    display: flex;
+    align-items: center;
+    gap: 120px;
+    padding: 48px 32px;
+    background: linear-gradient(
+      180.8deg,
+      rgba(203, 213, 224, 0.624) 34.33%,
+      rgba(254, 235, 200, 0.56) 64.27%
+    );
+    box-shadow:
+      0px 0px 8px rgba(0, 0, 0, 0.08),
+      0px 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 28.8px;
+  }
+
+  &__left {
+    max-width: 650px;
+  }
+
+  &__img {
+    border-radius: 20px;
+  }
+
+  &__title {
+    margin: 0 0 48px;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 100%;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+  }
+
+  &__decr {
+    margin: 0 0 32px;
+    font-size: 16px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #2d3748;
+    max-width: 515px;
+  }
+
+  &__list {
+    margin: 0 0 36px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    gap: 80px;
+  }
+
+  &__top {
+    display: block;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #3d3d3d;
+  }
+
+  &__bottom {
+    display: block;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #3d3d3d;
+  }
+
+  &__btn {
+    border-radius: 8px;
+  }
+}

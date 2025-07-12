@@ -3,7 +3,7 @@ import imgCard1 from '@/assets/img/card-1.jpg';
 import imgCard2 from '@/assets/img/card-2.jpg';
 import imgCard3 from '@/assets/img/card-3.jpg';
 import imgCard4 from '@/assets/img/card-4.jpg';
-import Button from '../ButtonComponent/Button';
+import Button from '../../ui/ButtonComponent/Button';
 
 import './_hero.scss';
 
