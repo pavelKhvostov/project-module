@@ -1,0 +1,58 @@
+.step-get-card {
+  margin: 0 0 45px;
+
+  &__title {
+    text-align: center;
+    margin: 0 0 14px;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 147.4%;
+    color: #000000;
+  }
+
+  &__ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__item {
+    max-width: 335px;
+  }
+
+  &__wrap {
+    display: flex;
+    gap: 36px;
+    align-items: center;
+  }
+
+  &__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: #d9d9d9;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 147.4%;
+    color: #000000;
+  }
+
+  &__bott {
+    width: 250px;
+    height: 2px;
+    background-color: #d9d9d9;
+  }
+
+  &__decr {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 147.4%;
+    color: #000000;
+    text-align: center;
+  }
+}
