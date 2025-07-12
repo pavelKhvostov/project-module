@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from '../ButtonComponent/Button';
 import BurgerButton from '../BurgerComponent/Burger';
+import { Link } from 'react-router-dom';
 
 import './_header.scss';
 
@@ -9,30 +10,30 @@ const Header: React.FC = () => {
     <header className='header'>
       <div className='container'>
         <div className='header__wrap'>
-          <a href='#' className='header__logo'>
+          <Link to='/' className='header__logo'>
             NeoBank
-          </a>
+          </Link>
           <nav className='header__nav'>
             <ul className='header__list'>
               <li className='header__item'>
-                <a href='#' className='header__link'>
+                <Link to='/credit-card' className='header__link'>
                   Credit card
-                </a>
+                </Link>
               </li>
               <li className='header__item'>
-                <a href='#' className='header__link'>
+                <Link to='/product' className='header__link'>
                   Product
-                </a>
+                </Link>
               </li>
               <li className='header__item'>
-                <a href='#' className='header__link'>
+                <Link to='/account' className='header__link'>
                   Account
-                </a>
+                </Link>
               </li>
               <li className='header__item'>
-                <a href='#' className='header__link'>
+                <Link to='/resources' className='header__link'>
                   Resources
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>
