@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import './_form-subscribe.scss';
 
@@ -20,21 +21,12 @@ const SubscribeForm: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8080/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        setIsSubscribed(true);
-        localStorage.setItem('isSubscribed', 'true');
-      } else {
-        alert('Ошибка при подписке');
-      }
+      await axios.post('http://localhost:8080/email', { email });
+      setIsSubscribed(true);
+      localStorage.setItem('isSubscribed', 'true');
     } catch (error) {
       console.error('Ошибка при запросе:', error);
-      alert('Сервер недоступен');
+      alert('Ошибка при подписке или сервер недоступен');
     }
   };
 
