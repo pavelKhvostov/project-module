@@ -79,9 +79,8 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
       const response = await axios.post('http://localhost:8080/application', payload, {
         headers: { 'Content-Type': 'application/json' },
       });
-      console.log('✅ Submit successful:', response.data);
     } catch (error) {
-      console.error('❌ Submit failed:', error);
+      console.error('Submit failed:', error);
     } finally {
       setIsLoading(false);
     }
