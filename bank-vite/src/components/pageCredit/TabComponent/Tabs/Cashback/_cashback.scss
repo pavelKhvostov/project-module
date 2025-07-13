@@ -1,7 +1,13 @@
+@use '@/globalScss/_mixins' as *;
+
 .cashback {
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
+
+  @include vp-1110 {
+    flex-direction: column;
+  }
 
   &__card {
     display: flex;

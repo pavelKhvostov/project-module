@@ -1,3 +1,5 @@
+@use '@/globalScss/_mixins' as *;
+
 .customize-card {
   &__title {
     margin: 0 0 26px;
@@ -13,6 +15,10 @@
     flex-wrap: wrap;
     gap: 16px;
     margin: 0 0 68px;
+
+    @include vp-1110 {
+      justify-content: center;
+    }
   }
 
   &__field {

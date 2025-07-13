@@ -9,4 +9,9 @@
   letter-spacing: 0.02em;
   color: #ffffff;
   cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background-color: #7796c0;
+  }
 }
