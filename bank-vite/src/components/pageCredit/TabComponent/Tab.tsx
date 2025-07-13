@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import FeaturesSection from './Tabs/FeaturesSection/FeaturesSection';
 
 import './_tab.scss';
+import Rate from './Tabs/Rates/Rate';
+import Cashback from './Tabs/Cashback/Cashback';
+import FAQ from './Tabs/FAQ/FAQ';
 
 const tabs = ['About card', 'Rates and conditions', 'Cashback', 'FAQ'];
 
@@ -13,11 +16,11 @@ const Tab: React.FC = () => {
       case 0:
         return <FeaturesSection />;
       case 1:
-        return <div>Rates and conditions content</div>;
+        return <Rate />;
       case 2:
-        return <div>Cashback content</div>;
+        return <Cashback />;
       case 3:
-        return <div>FAQ content</div>;
+        return <FAQ />;
       default:
         return null;
     }
