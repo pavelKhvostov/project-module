@@ -8,18 +8,43 @@ interface IFormCardProps {
 }
 
 const Form: React.FC<IFormCardProps> = ({ step, children }) => {
-  const [amount, setAmount] = useState(150000);
-
   const min = 15000;
   const max = 600000;
+
+  const [amount, setAmount] = useState<number>(150000);
+  const [amountInput, setAmountInput] = useState<string>('150000');
+
+  const parsedAmount = Number(amountInput);
+
   const percentage = ((amount - min) / (max - min)) * 100;
 
   const sliderStyle = {
     background: `linear-gradient(to right, #6c2bd9 0%, #6c2bd9 ${percentage}%, #e7ecf2 ${percentage}%, #e7ecf2 100%)`,
   };
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(Number(e.target.value));
+  const handleRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    setAmount(value);
+    setAmountInput(String(value));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountInput(e.target.value);
+  };
+
+  const handleInputBlur = () => {
+    let value = Number(amountInput);
+
+    if (isNaN(value)) {
+      value = min;
+    } else if (value < min) {
+      value = min;
+    } else if (value > max) {
+      value = max;
+    }
+
+    setAmount(value);
+    setAmountInput(String(value));
   };
 
   return (
@@ -45,18 +70,18 @@ const Form: React.FC<IFormCardProps> = ({ step, children }) => {
                 type='range'
                 id='amount'
                 name='amount'
-                min='15000'
-                max='600000'
-                step='1000'
+                min={min}
+                max={max}
+                step='1'
                 value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
+                onChange={handleRangeChange}
                 className='form__slider'
                 style={sliderStyle}
               />
 
               <div className='form__range-labels'>
-                <span className='form__price'>15 000</span>
-                <span className='form__price'>600 000</span>
+                <span className='form__price'>{min.toLocaleString('ru-RU')}</span>
+                <span className='form__price'>{max.toLocaleString('ru-RU')}</span>
               </div>
             </div>
           </div>
@@ -64,7 +89,16 @@ const Form: React.FC<IFormCardProps> = ({ step, children }) => {
           <div className='form__wrap-right'>
             <div className='form__wrap-choice'>
               <h3 className='form__heading'>You have chosen the amount</h3>
-              <span className='form__value'>{amount.toLocaleString('ru-RU')} ₽</span>
+
+              <div className='form__amount-wrapper'>
+                <input
+                  type='number'
+                  className='form__amount-input'
+                  value={amountInput}
+                  onChange={handleInputChange}
+                  onBlur={handleInputBlur}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -77,7 +111,9 @@ const Form: React.FC<IFormCardProps> = ({ step, children }) => {
 
       <div className='form__body'>{children}</div>
 
-      <Button type='submit'>Continue</Button>
+      <Button className='form__button' type='submit'>
+        Continue
+      </Button>
     </section>
   );
 };

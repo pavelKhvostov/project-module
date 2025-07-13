@@ -1,0 +1,47 @@
+.features-section {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 40px;
+
+  &__card {
+    padding: 32px;
+    box-shadow:
+      0px 0px 8px rgba(0, 0, 0, 0.08),
+      0px 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 28px;
+    background-color: #eaecee;
+
+    &--dark {
+      background-color: #a2afc5;
+    }
+
+    &:nth-child(1),
+    &:nth-child(2),
+    &:nth-child(3) {
+      grid-column: span 2;
+    }
+
+    &:nth-child(4),
+    &:nth-child(5) {
+      grid-column: span 3;
+    }
+  }
+
+  &__title {
+    margin: 0 0 16px;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 147.4%;
+    letter-spacing: 0.02em;
+    color: #000000;
+  }
+
+  &__decr {
+    margin: 0;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0.02em;
+    color: #000000;
+  }
+}

@@ -1,4 +1,7 @@
 .form {
+  margin: 0 0 100px;
+
+  position: relative;
   padding: 30px 40px;
   width: 100%;
   background: #ffffff;
@@ -107,5 +110,49 @@
         background-color: #4b1fb2;
       }
     }
+  }
+
+  &__amount-input {
+    border: none;
+    padding-bottom: 10px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 100%;
+    color: #000000;
+    border-bottom: 1px solid #e6e6e6;
+
+    &:hover,
+    &:focus-visible,
+    &:active {
+      outline: none;
+      border-color: #5b35d5;
+    }
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  &__wrap-right {
+    padding-left: 42px;
+    border-left: 1px dashed #cccccc;
+  }
+
+  &__heading {
+    margin: 0 0 16px;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+    color: #000000;
+  }
+
+  &__button {
+    position: absolute;
+    right: 45px;
+    bottom: 30px;
+    padding: 16px 35px;
+    border-radius: 8px;
   }
 }
