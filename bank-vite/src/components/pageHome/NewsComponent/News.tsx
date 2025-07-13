@@ -11,8 +11,8 @@ export interface IArticle {
   description: string;
 }
 
-// const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
-// const PAGE_SIZE = 20;
+const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+const PAGE_SIZE = 20;
 
 //Утилита для проверки валидности изображения
 const isValidImageUrl = (url: string | null | undefined): boolean => {
@@ -75,7 +75,7 @@ const News: React.FC = () => {
 
   return (
     <section className='news'>
-      {/* <div className='container'>
+      <div className='container'>
         <h2 className='news__title'>Current news from the world of finance</h2>
         <span className='news__text'>
           We update the news feed every 15 minutes. You can learn more by clicking on the news you
@@ -83,7 +83,7 @@ const News: React.FC = () => {
         </span>
 
         {isLoading ? <p className='news_loading'>Loading...</p> : <Slider articles={articles} />}
-      </div> */}
+      </div>
     </section>
   );
 };

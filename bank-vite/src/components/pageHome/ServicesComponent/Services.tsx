@@ -23,26 +23,26 @@ const CURRENCY_NAMES: Record<TCurrencyCode, string> = {
   JPY: 'JPY',
 };
 
-// const ACCESS_KEY = import.meta.env.VITE_SERVICES_API_KEY;
+const ACCESS_KEY = import.meta.env.VITE_SERVICES_API_KEY;
 
-// Функция получения курса одной валюты
-// const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
-//   const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
-//   try {
-//     const response = await axios.get(url);
-//     const rate = response.data.conversion_rate;
-//     if (rate) {
-//       return {
-//         code,
-//         rate: Number(rate.toFixed(2)),
-//       };
-//     }
-//     return null;
-//   } catch (error) {
-//     console.error(`Ошибка при получении курса ${code}:`, error);
-//     return null;
-//   }
-// };
+Функция получения курса одной валюты
+const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
+  const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
+  try {
+    const response = await axios.get(url);
+    const rate = response.data.conversion_rate;
+    if (rate) {
+      return {
+        code,
+        rate: Number(rate.toFixed(2)),
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`Ошибка при получении курса ${code}:`, error);
+    return null;
+  }
+};
 
 // Универсальная функция получения курсов для переданного списка валют
 const fetchAllRates = async (
@@ -91,7 +91,7 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
 
   return (
     <section className='services'>
-      {/* <div className='container'>
+      <div className='container'>
         <div className='services__wrap'>
           <div className='services__left'>
             <img className='services__icon' src={pepleSvg} width='509' height='415' alt='...' />
@@ -157,7 +157,7 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
             <img className='services__icon' src={banckSvg} width='120' height='113' alt='...' />
           </div>
         </div>
-      </div> */}
+      </div>
     </section>
   );
 };
