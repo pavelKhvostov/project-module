@@ -25,7 +25,6 @@ const CURRENCY_NAMES: Record<TCurrencyCode, string> = {
 
 const ACCESS_KEY = import.meta.env.VITE_SERVICES_API_KEY;
 
-Функция получения курса одной валюты
 const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
   const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
   try {
