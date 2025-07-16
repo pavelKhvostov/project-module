@@ -186,7 +186,7 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                         {...register('email', {
                           required: 'Email required',
                           pattern: {
-                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                            value: /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{2,}\.[a-zA-Z]{2,}$/,
                             message: 'Incorrect email address',
                           },
                         })}
