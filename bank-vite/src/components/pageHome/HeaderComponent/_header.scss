@@ -30,10 +30,15 @@
     line-height: 112%;
     letter-spacing: 0.02em;
     color: #1d1929;
+    transition: color 0.3s ease;
 
     &:hover,
     &:focus-visible,
     &:active {
+      color: #b2a35f;
+    }
+
+    &--active {
       color: #b2a35f;
     }
   }

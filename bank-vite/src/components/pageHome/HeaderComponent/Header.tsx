@@ -1,39 +1,44 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
+
 import Button from '../../ui/ButtonComponent/Button';
 import BurgerButton from '../BurgerComponent/Burger';
-import { Link } from 'react-router-dom';
 
 import './_header.scss';
 
 const Header: React.FC = () => {
+  const getNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+    isActive ? 'header__link header__link--active' : 'header__link';
+
   return (
     <header className='header'>
       <div className='container'>
         <div className='header__wrap'>
-          <Link to='/' className='header__logo'>
+          <NavLink to='/' className='header__logo'>
             NeoBank
-          </Link>
+          </NavLink>
+
           <nav className='header__nav'>
             <ul className='header__list'>
               <li className='header__item'>
-                <Link to='/credit-card' className='header__link'>
+                <NavLink to='/credit-card' className={getNavLinkClass}>
                   Credit card
-                </Link>
+                </NavLink>
               </li>
               <li className='header__item'>
-                <Link to='/product' className='header__link'>
+                <NavLink to='/product' className={getNavLinkClass}>
                   Product
-                </Link>
+                </NavLink>
               </li>
               <li className='header__item'>
-                <Link to='/account' className='header__link'>
+                <NavLink to='/account' className={getNavLinkClass}>
                   Account
-                </Link>
+                </NavLink>
               </li>
               <li className='header__item'>
-                <Link to='/resources' className='header__link'>
+                <NavLink to='/resources' className={getNavLinkClass}>
                   Resources
-                </Link>
+                </NavLink>
               </li>
             </ul>
           </nav>
