@@ -63,11 +63,13 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
 
+    console.log(data.firstName.trim());
+
     const payload: ApplicationPayload = {
       amount,
       term: Number(data.term),
-      firstName: data.firstName,
-      lastName: data.lastName,
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
       middleName: data.patronymic?.trim() || null,
       email: data.email,
       birthdate: data.birth,
@@ -79,6 +81,8 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
       const response = await axios.post('http://localhost:8080/application', payload, {
         headers: { 'Content-Type': 'application/json' },
       });
+
+      console.log(response.data);
     } catch (error) {
       console.error('Submit failed:', error);
     } finally {
@@ -109,8 +113,9 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                           required: 'Enter your last name',
                           validate: {
                             notEmpty: (v) => v.trim() !== '' || 'Cannot be empty',
+                            minLength: (v) => v.trim().length >= 4,
                             latinOnly: (v) =>
-                              /^[A-Za-z\s'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
+                              /^[A-Za-z'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
                           },
                         })}
                         placeholder='For Example Doe'
@@ -134,8 +139,9 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                           required: 'Enter your first name',
                           validate: {
                             notEmpty: (v) => v.trim() !== '' || 'Cannot be empty',
+                            minLength: (v) => v.trim().length >= 4,
                             latinOnly: (v) =>
-                              /^[A-Za-z\s'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
+                              /^[A-Za-z'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
                           },
                         })}
                         placeholder='For Example John'
