@@ -63,8 +63,6 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
 
-    console.log(data.firstName.trim());
-
     const payload: ApplicationPayload = {
       amount,
       term: Number(data.term),
@@ -81,8 +79,6 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
       const response = await axios.post('http://localhost:8080/application', payload, {
         headers: { 'Content-Type': 'application/json' },
       });
-
-      console.log(response.data);
     } catch (error) {
       console.error('Submit failed:', error);
     } finally {

@@ -24,6 +24,10 @@ const CURRENCY_NAMES: Record<TCurrencyCode, string> = {
 };
 
 const ACCESS_KEY = import.meta.env.VITE_SERVICES_API_KEY;
+const FORCE_FETCH = import.meta.env.VITE_FORCE_FETCH_RATES === 'true';
+
+const CACHE_KEY = 'currency_rates_cache';
+const CACHE_TTL = 1000 * 60 * 15;
 
 const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
   const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
@@ -43,18 +47,43 @@ const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | nul
   }
 };
 
-// Универсальная функция получения курсов для переданного списка валют
 const fetchAllRates = async (
   codes: TCurrencyCode[] = Object.keys(CURRENCY_NAMES) as TCurrencyCode[],
 ): Promise<ICurrencyRate[]> => {
-  const result: ICurrencyRate[] = [];
+  const cached = localStorage.getItem(CACHE_KEY);
 
+  if (!FORCE_FETCH && cached) {
+    try {
+      const { timestamp, data } = JSON.parse(cached);
+      const isFresh = Date.now() - timestamp < CACHE_TTL; // Проверяем, свежий ли кэш(15 минут)
+
+      if (isFresh) {
+        return data; // Используем кэшированные курсы валют
+      }
+    } catch (error) {
+      console.warn('Ошибка чтения кэша валют:', error);
+    }
+  }
+
+  // когда 15 минут прошло, делаем запрос к API
+
+  const result: ICurrencyRate[] = [];
   for (const code of codes) {
     const data = await getExchangeRate(code);
     if (data) {
       result.push(data);
     }
   }
+
+  // новый кэш
+
+  localStorage.setItem(
+    CACHE_KEY,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data: result,
+    }),
+  );
 
   return result;
 };
@@ -83,9 +112,6 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
     };
 
     loadRates();
-    const interval = setInterval(loadRates, 1000 * 60 * 15); // обновлять каждые 15 минут
-
-    return () => clearInterval(interval);
   }, [currencyCodes]);
 
   return (
