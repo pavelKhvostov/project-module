@@ -30,6 +30,12 @@ interface ApplicationPayload {
   passportNumber: string;
 }
 
+const getMaxBirthdate = () => {
+  const today = new Date();
+  today.setFullYear(today.getFullYear() - 18);
+  return today.toISOString().split('T')[0];
+};
+
 const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
   const [dateInputType, setDateInputType] = useState<'text' | 'date'>('text');
   const [isLoading, setIsLoading] = useState(false);
@@ -157,11 +163,25 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                     <div className='customize-card__input-wrap'>
                       <input
                         id='patronymic'
-                        {...register('patronymic')}
+                        {...register('patronymic', {
+                          validate: (value) => {
+                            const v = (value || '').trim();
+
+                            if (v === '') return true;
+                            if (v.length < 4) return 'Minimum 4 characters';
+                            if (!/^[A-Za-z'-]+$/.test(v)) return 'Only Latin letters allowed';
+
+                            return true;
+                          },
+                        })}
                         placeholder='For Example Victorovich'
-                        className='customize-card__input'
+                        className={`customize-card__input ${errors.patronymic ? 'customize-card__input--error' : ''}`}
                       />
+                      {renderIcon('patronymic')}
                     </div>
+                    {errors.patronymic && (
+                      <p className='customize-card__error'>{errors.patronymic.message}</p>
+                    )}
                   </div>
 
                   <div className='customize-card__field'>
@@ -212,18 +232,30 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                         type={dateInputType}
                         onFocus={() => setDateInputType('date')}
                         placeholder='Select Date and Time'
+                        min='1900-01-01'
+                        max={getMaxBirthdate()}
                         {...register('birth', {
                           required: 'Date is required',
                           validate: (v) => {
                             const date = new Date(v);
-                            const age = new Date().getFullYear() - date.getFullYear();
-                            return age >= 18 || 'Must be 18+';
+                            if (isNaN(date.getTime())) return 'Invalid date';
+
+                            const now = new Date();
+                            const age = now.getFullYear() - date.getFullYear();
+
+                            const minDate = new Date('1900-01-01');
+
+                            if (date < minDate) return 'Date is unrealistically old';
+                            if (age < 18) return 'Must be 18+';
+
+                            return true;
                           },
                         })}
                         className={`customize-card__input ${errors.birth ? 'customize-card__input--error' : ''}`}
                       />
                       {renderIcon('birth')}
                     </div>
+
                     {errors.birth && (
                       <p className='customize-card__error'>Incorrect date of birth</p>
                     )}
