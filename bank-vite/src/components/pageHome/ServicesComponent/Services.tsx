@@ -104,14 +104,31 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
   });
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadRates = async () => {
+      if (!isMounted) return;
       setIsLoading(true);
       const data = await fetchAllRates(currencyCodes);
-      setRates(data);
-      setIsLoading(false);
+      if (isMounted) {
+        setRates(data);
+        setIsLoading(false);
+      }
     };
 
     loadRates();
+
+    const intervalId = setInterval(
+      () => {
+        loadRates(); // вызов каждые 15 минут
+      },
+      15 * 60 * 1000,
+    );
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId); // очищаем интервал при размонтировании
+    };
   }, [currencyCodes]);
 
   return (
