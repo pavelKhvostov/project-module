@@ -34,6 +34,10 @@
       letter-spacing: 0.02em;
       color: #9092b0;
     }
+
+    &--error {
+      outline: 1px solid #ff5631;
+    }
   }
 
   &__btn {
@@ -61,5 +65,9 @@
 
   &__confirmed {
     text-align: center;
+  }
+
+  &__error {
+    color: #ff5631;
   }
 }

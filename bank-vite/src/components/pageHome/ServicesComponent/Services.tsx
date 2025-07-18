@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import pepleSvg from '@/assets/img/services-svg-hero.svg';
 import checkSvg from '@/assets/img/checked.svg';
-import banckSvg from '@/assets/img/bank-icon.svg';
+import bankSvg from '@/assets/img/bank-icon.svg';
 
 import './_services.scss';
 
@@ -27,7 +27,7 @@ const ACCESS_KEY = import.meta.env.VITE_SERVICES_API_KEY;
 const FORCE_FETCH = import.meta.env.VITE_FORCE_FETCH_RATES === 'true';
 
 const CACHE_KEY = 'currency_rates_cache';
-const CACHE_TTL = 1000 * 60 * 15;
+const CACHE_TTL = 1000 * 60 * 14; // 15 минут
 
 const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
   const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
@@ -49,33 +49,30 @@ const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | nul
 
 const fetchAllRates = async (
   codes: TCurrencyCode[] = Object.keys(CURRENCY_NAMES) as TCurrencyCode[],
+  force: boolean = false,
 ): Promise<ICurrencyRate[]> => {
   const cached = localStorage.getItem(CACHE_KEY);
 
-  if (!FORCE_FETCH && cached) {
+  if (!force && !FORCE_FETCH && cached) {
     try {
       const { timestamp, data } = JSON.parse(cached);
-      const isFresh = Date.now() - timestamp < CACHE_TTL; // Проверяем, свежий ли кэш(15 минут)
-
+      const isFresh = Date.now() - timestamp < CACHE_TTL;
       if (isFresh) {
-        return data; // Используем кэшированные курсы валют
+        return data;
       }
     } catch (error) {
       console.warn('Ошибка чтения кэша валют:', error);
     }
   }
 
-  // когда 15 минут прошло, делаем запрос к API
-
   const result: ICurrencyRate[] = [];
+
   for (const code of codes) {
     const data = await getExchangeRate(code);
     if (data) {
       result.push(data);
     }
   }
-
-  // новый кэш
 
   localStorage.setItem(
     CACHE_KEY,
@@ -96,38 +93,32 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
   const [rates, setRates] = useState<ICurrencyRate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString('ru-RU', {
+  const formattedDate = new Date().toLocaleDateString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   });
 
+  const loadRates = async (force: boolean = false) => {
+    setIsLoading(true);
+    const data = await fetchAllRates(currencyCodes, force);
+    setRates(data);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    let isMounted = true;
-
-    const loadRates = async () => {
-      if (!isMounted) return;
-      setIsLoading(true);
-      const data = await fetchAllRates(currencyCodes);
-      if (isMounted) {
-        setRates(data);
-        setIsLoading(false);
-      }
-    };
-
-    loadRates();
+    loadRates(); // первая загрузка
 
     const intervalId = setInterval(
       () => {
-        loadRates(); // вызов каждые 15 минут
+        loadRates(true); // обновление каждые 15 минут
       },
+
       15 * 60 * 1000,
     );
 
     return () => {
-      isMounted = false;
-      clearInterval(intervalId); // очищаем интервал при размонтировании
+      clearInterval(intervalId);
     };
   }, [currencyCodes]);
 
@@ -145,37 +136,28 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
               each feature
             </p>
             <ul className='services__list'>
-              <li className='services__item'>
-                <div className='services__inner'>
-                  <img className='services__icon-checked' src={checkSvg} alt='✔' />
-                  <span className='services__text'>Powerfull online protection.</span>
-                </div>
-              </li>
-              <li className='services__item'>
-                <div className='services__inner'>
-                  <img className='services__icon-checked' src={checkSvg} alt='✔' />
-                  <span className='services__text'>Cashback without borders.</span>
-                </div>
-              </li>
-              <li className='services__item'>
-                <div className='services__inner'>
-                  <img className='services__icon-checked' src={checkSvg} alt='✔' />
-                  <span className='services__text'>Personal design</span>
-                </div>
-              </li>
-              <li className='services__item'>
-                <div className='services__inner'>
-                  <img className='services__icon-checked' src={checkSvg} alt='✔' />
-                  <span className='services__text'>Work anywhere in the world</span>
-                </div>
-              </li>
+              {[
+                'Powerfull online protection.',
+                'Cashback without borders.',
+                'Personal design',
+                'Work anywhere in the world',
+              ].map((text, index) => (
+                <li className='services__item' key={index}>
+                  <div className='services__inner'>
+                    <img className='services__icon-checked' src={checkSvg} alt='✔' />
+                    <span className='services__text'>{text}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
+
         <div className='services__currency'>
           <div className='services__curr-left-inner'>
             <h3 className='services__heding'>Exchange rate in internet bank</h3>
             <span className='services__curr-text'>Currency</span>
+
             {isLoading ? (
               <p className='services__loading'>loading...</p>
             ) : (
@@ -188,15 +170,17 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
                 ))}
               </ul>
             )}
+
             <a href='#' className='services__link'>
               All courses
             </a>
           </div>
+
           <div className='services__curr-right-inner'>
             <span className='services__text-date'>
               Update every 15 minutes, MSC {formattedDate}
             </span>
-            <img className='services__icon' src={banckSvg} width='120' height='113' alt='...' />
+            <img className='services__icon' src={bankSvg} width='120' height='113' alt='...' />
           </div>
         </div>
       </div>

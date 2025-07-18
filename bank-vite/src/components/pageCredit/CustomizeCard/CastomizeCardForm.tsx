@@ -36,6 +36,12 @@ const getMaxBirthdate = () => {
   return today.toISOString().split('T')[0];
 };
 
+const getMinBirthdate = () => {
+  const today = new Date();
+  today.setFullYear(today.getFullYear() - 75);
+  return today.toISOString().split('T')[0];
+};
+
 const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
   const [dateInputType, setDateInputType] = useState<'text' | 'date'>('text');
   const [isLoading, setIsLoading] = useState(false);
@@ -232,7 +238,7 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                         type={dateInputType}
                         onFocus={() => setDateInputType('date')}
                         placeholder='Select Date and Time'
-                        min='1900-01-01'
+                        min={getMinBirthdate()}
                         max={getMaxBirthdate()}
                         {...register('birth', {
                           required: 'Date is required',
@@ -241,18 +247,20 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                             if (isNaN(date.getTime())) return 'Invalid date';
 
                             const now = new Date();
-                            const age = now.getFullYear() - date.getFullYear();
+                            const birthYear = date.getFullYear();
+                            const currentYear = now.getFullYear();
 
-                            const minDate = new Date('1900-01-01');
+                            const age = currentYear - birthYear;
 
-                            if (date < minDate) return 'Date is unrealistically old';
-                            if (age < 18) return 'Must be 18+';
+                            if (age < 18) return 'You must be at least 18 years old';
+                            if (age > 75) return 'You must be younger than 75 years old';
 
                             return true;
                           },
                         })}
                         className={`customize-card__input ${errors.birth ? 'customize-card__input--error' : ''}`}
                       />
+
                       {renderIcon('birth')}
                     </div>
 

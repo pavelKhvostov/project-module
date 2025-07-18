@@ -96,6 +96,20 @@ const Form: React.FC<IFormCardProps> = ({ step, children, onSubmit, amount, setA
                 value={amountInput}
                 onChange={handleInputChange}
                 onBlur={handleInputBlur}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+
+                    let value = Number(amountInput);
+
+                    if (isNaN(value)) value = MIN_AMOUNT;
+                    else if (value < MIN_AMOUNT) value = MIN_AMOUNT;
+                    else if (value > MAX_AMOUNT) value = MAX_AMOUNT;
+
+                    updateAmount(value); // обновит слайдер
+                    setAmountInput(String(value)); // отформатирует поле
+                  }
+                }}
               />
             </div>
           </div>
