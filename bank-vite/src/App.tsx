@@ -7,6 +7,7 @@ import CreditCard from '@/pages/CreditCard';
 import Product from '@/pages/Product';
 import Account from '@/pages/Account';
 import Resources from '@/pages/Resources';
+import NotFoundPage from './pages/NotFound';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path='/product' element={<Product />} />
           <Route path='/account' element={<Account />} />
           <Route path='/resources' element={<Resources />} />
+          <Route path='*' element={<NotFoundPage />} />
         </Routes>
       </main>
       <Footer />

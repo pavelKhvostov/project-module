@@ -1,6 +1,7 @@
 @use '@/globalScss/_mixins' as *;
 
 .customize-card {
+  margin: 0 0 100px;
   &__title {
     margin: 0 0 26px;
     font-weight: 700;

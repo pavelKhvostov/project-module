@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import './_castomizeCardForm.scss';
 import Form from '@/components/ui/FormComponent.tsx/Form';
 import errorSvg from '@/assets/img/Close_round_fill.svg';
@@ -6,6 +6,10 @@ import checkSvg from '@/assets/img/Check_fill.svg';
 import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import axios from 'axios';
 import Loader from '@/components/ui/Loader/Loader';
+import OfferCard from '../OfferCard/OfferCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { setOffers } from '@/redux/slices/offerSlices';
+import { RootState } from '@/redux/store';
 
 interface FormValues {
   lastName: string;
@@ -72,6 +76,30 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
     return null;
   };
 
+  const dispatch = useDispatch();
+
+  const offers = useSelector((state: RootState) => state.offers.offers);
+
+  useEffect(() => {
+    console.log('Redux обновился. Актуальные offers:', offers);
+  }, [offers]);
+
+  useEffect(() => {
+    const savedOffers = localStorage.getItem('offers');
+    const formSubmitted = localStorage.getItem('formSubmitted') === 'true';
+
+    if (savedOffers && formSubmitted) {
+      try {
+        const parsedOffers = JSON.parse(savedOffers);
+        if (Array.isArray(parsedOffers)) {
+          dispatch(setOffers(parsedOffers));
+        }
+      } catch (err) {
+        console.error('Ошибка при чтении offers из localStorage:', err);
+      }
+    }
+  }, []);
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
 
@@ -91,6 +119,15 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
       const response = await axios.post('http://localhost:8080/application', payload, {
         headers: { 'Content-Type': 'application/json' },
       });
+
+      console.log('Полученные предложения:', response.data);
+
+      dispatch(setOffers(response.data));
+
+      console.log('Состояние offers:', offers);
+
+      localStorage.setItem('offers', JSON.stringify(response.data));
+      localStorage.setItem('formSubmitted', 'true');
     } catch (error) {
       console.error('Submit failed:', error);
     } finally {
@@ -321,6 +358,7 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
             )}
           </Form>
         </FormProvider>
+        {/* <OfferCard /> */}
       </div>
     </section>
   );
