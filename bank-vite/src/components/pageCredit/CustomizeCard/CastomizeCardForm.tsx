@@ -8,8 +8,13 @@ import axios from 'axios';
 import Loader from '@/components/ui/Loader/Loader';
 import OfferCard from '../OfferCard/OfferCard';
 import { useDispatch, useSelector } from 'react-redux';
-import { setOffers } from '@/redux/slices/offerSlices';
+import {
+  setIsFlagSubmitted,
+  setOffers,
+  setSelectedApplicationId,
+} from '@/redux/slices/offerSlices';
 import { RootState } from '@/redux/store';
+import Success from '../SuccessBaner/Success';
 
 interface FormValues {
   lastName: string;
@@ -50,6 +55,21 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
   const [dateInputType, setDateInputType] = useState<'text' | 'date'>('text');
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState<number>(150000);
+  const isSubmitted = useSelector((state: RootState) => state.offers.isSubmitted);
+  const dispatch = useDispatch();
+  const offers = useSelector((state: RootState) => state.offers.offers);
+
+  const handleOfferSelect = async (applicationId: number) => {
+    try {
+      await axios.post('http://localhost:8080/application/apply', { applicationId });
+      dispatch(setIsFlagSubmitted(true));
+      dispatch(setSelectedApplicationId(applicationId));
+      localStorage.setItem('Submitted', 'true');
+      localStorage.setItem('SelectedAppId', String(applicationId));
+    } catch (err) {
+      console.error('Ошибка при выборе предложения:', err);
+    }
+  };
 
   const methods = useForm<FormValues>({
     mode: 'onSubmit',
@@ -75,14 +95,6 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
     }
     return null;
   };
-
-  const dispatch = useDispatch();
-
-  const offers = useSelector((state: RootState) => state.offers.offers);
-
-  useEffect(() => {
-    console.log('Redux обновился. Актуальные offers:', offers);
-  }, [offers]);
 
   useEffect(() => {
     const savedOffers = localStorage.getItem('offers');
@@ -120,11 +132,7 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      console.log('Полученные предложения:', response.data);
-
       dispatch(setOffers(response.data));
-
-      console.log('Состояние offers:', offers);
 
       localStorage.setItem('offers', JSON.stringify(response.data));
       localStorage.setItem('formSubmitted', 'true');
@@ -137,228 +145,252 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <section className='customize-card' ref={ref}>
       <div className='container'>
-        <FormProvider {...methods}>
-          <Form step={1} onSubmit={handleSubmit(onSubmit)} amount={amount} setAmount={setAmount}>
-            {isLoading ? (
-              <div className='customize-card__loader'>
-                <Loader />
-              </div>
-            ) : (
-              <>
-                <h2 className='customize-card__title'>Contact Information</h2>
-                <div className='customize-card__fields'>
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='lastName'>
-                      Your last name <span>*</span>
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <input
-                        id='lastName'
-                        {...register('lastName', {
-                          required: 'Enter your last name',
-                          validate: {
-                            notEmpty: (v) => v.trim() !== '' || 'Cannot be empty',
-                            minLength: (v) => v.trim().length >= 4,
-                            latinOnly: (v) =>
-                              /^[A-Za-z'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
-                          },
-                        })}
-                        placeholder='For Example Doe'
-                        className={`customize-card__input ${errors.lastName ? 'customize-card__input--error' : ''}`}
-                      />
-                      {renderIcon('lastName')}
-                    </div>
-                    {errors.lastName && (
-                      <p className='customize-card__error'>{errors.lastName.message}</p>
-                    )}
+        {isSubmitted ? (
+          <>
+            <Success />
+          </>
+        ) : offers.length > 0 ? (
+          <div className='customize-card__offer-wrap'>
+            {offers
+              .slice()
+              .sort((a, b) => {
+                if (a.rate !== b.rate) return b.rate - a.rate;
+                return b.totalAmount - a.totalAmount;
+              })
+              .map((offer, index) => (
+                <OfferCard key={index} offer={offer} onSelect={handleOfferSelect} />
+              ))}
+          </div>
+        ) : (
+          <>
+            <FormProvider {...methods}>
+              <Form
+                step={1}
+                onSubmit={handleSubmit(onSubmit)}
+                amount={amount}
+                setAmount={setAmount}
+              >
+                {isLoading ? (
+                  <div className='customize-card__loader'>
+                    <Loader />
                   </div>
+                ) : (
+                  <>
+                    <h2 className='customize-card__title'>Contact Information</h2>
+                    <div className='customize-card__fields'>
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='lastName'>
+                          Your last name <span>*</span>
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <input
+                            id='lastName'
+                            {...register('lastName', {
+                              required: 'Enter your last name',
+                              validate: {
+                                notEmpty: (v) => v.trim() !== '' || 'Cannot be empty',
+                                minLength: (v) => v.trim().length >= 4,
+                                latinOnly: (v) =>
+                                  /^[A-Za-z'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
+                              },
+                            })}
+                            placeholder='For Example Doe'
+                            className={`customize-card__input ${errors.lastName ? 'customize-card__input--error' : ''}`}
+                          />
+                          {renderIcon('lastName')}
+                        </div>
+                        {errors.lastName && (
+                          <p className='customize-card__error'>{errors.lastName.message}</p>
+                        )}
+                      </div>
 
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='firstName'>
-                      Your first name <span>*</span>
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <input
-                        id='firstName'
-                        {...register('firstName', {
-                          required: 'Enter your first name',
-                          validate: {
-                            notEmpty: (v) => v.trim() !== '' || 'Cannot be empty',
-                            minLength: (v) => v.trim().length >= 4,
-                            latinOnly: (v) =>
-                              /^[A-Za-z'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
-                          },
-                        })}
-                        placeholder='For Example John'
-                        className={`customize-card__input ${errors.firstName ? 'customize-card__input--error' : ''}`}
-                      />
-                      {renderIcon('firstName')}
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='firstName'>
+                          Your first name <span>*</span>
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <input
+                            id='firstName'
+                            {...register('firstName', {
+                              required: 'Enter your first name',
+                              validate: {
+                                notEmpty: (v) => v.trim() !== '' || 'Cannot be empty',
+                                minLength: (v) => v.trim().length >= 4,
+                                latinOnly: (v) =>
+                                  /^[A-Za-z'-]+$/.test(v.trim()) || 'Only Latin letters allowed',
+                              },
+                            })}
+                            placeholder='For Example John'
+                            className={`customize-card__input ${errors.firstName ? 'customize-card__input--error' : ''}`}
+                          />
+                          {renderIcon('firstName')}
+                        </div>
+                        {errors.firstName && (
+                          <p className='customize-card__error'>{errors.firstName.message}</p>
+                        )}
+                      </div>
+
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='patronymic'>
+                          Your patronymic
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <input
+                            id='patronymic'
+                            {...register('patronymic', {
+                              validate: (value) => {
+                                const v = (value || '').trim();
+
+                                if (v === '') return true;
+                                if (v.length < 4) return 'Minimum 4 characters';
+                                if (!/^[A-Za-z'-]+$/.test(v)) return 'Only Latin letters allowed';
+
+                                return true;
+                              },
+                            })}
+                            placeholder='For Example Victorovich'
+                            className={`customize-card__input ${errors.patronymic ? 'customize-card__input--error' : ''}`}
+                          />
+                          {renderIcon('patronymic')}
+                        </div>
+                        {errors.patronymic && (
+                          <p className='customize-card__error'>{errors.patronymic.message}</p>
+                        )}
+                      </div>
+
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='term'>
+                          Select term <span>*</span>
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <select id='term' {...register('term')} className='customize-card__input'>
+                            <option value='6'>6 month</option>
+                            <option value='12'>12 month</option>
+                            <option value='18'>18 month</option>
+                            <option value='24'>24 month</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='email'>
+                          Your email <span>*</span>
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <input
+                            id='email'
+                            {...register('email', {
+                              required: 'Email required',
+                              pattern: {
+                                value: /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{2,}\.[a-zA-Z]{2,}$/,
+                                message: 'Incorrect email address',
+                              },
+                            })}
+                            placeholder='test@gmail.com'
+                            className={`customize-card__input ${errors.email ? 'customize-card__input--error' : ''}`}
+                          />
+                          {renderIcon('email')}
+                        </div>
+                        {errors.email && (
+                          <p className='customize-card__error'>Incorrect email address</p>
+                        )}
+                      </div>
+
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='birth'>
+                          Your date of birth <span>*</span>
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <input
+                            id='birth'
+                            type={dateInputType}
+                            onFocus={() => setDateInputType('date')}
+                            placeholder='Select Date and Time'
+                            min={getMinBirthdate()}
+                            max={getMaxBirthdate()}
+                            {...register('birth', {
+                              required: 'Date is required',
+                              validate: (v) => {
+                                const date = new Date(v);
+                                if (isNaN(date.getTime())) return 'Invalid date';
+
+                                const now = new Date();
+                                const birthYear = date.getFullYear();
+                                const currentYear = now.getFullYear();
+
+                                const age = currentYear - birthYear;
+
+                                if (age < 18) return 'You must be at least 18 years old';
+                                if (age > 75) return 'You must be younger than 75 years old';
+
+                                return true;
+                              },
+                            })}
+                            className={`customize-card__input ${errors.birth ? 'customize-card__input--error' : ''}`}
+                          />
+
+                          {renderIcon('birth')}
+                        </div>
+
+                        {errors.birth && (
+                          <p className='customize-card__error'>Incorrect date of birth</p>
+                        )}
+                      </div>
+
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='passportSeries'>
+                          Your passport series <span>*</span>
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <input
+                            id='passportSeries'
+                            {...register('passportSeries', {
+                              required: 'Required',
+                              pattern: {
+                                value: /^\d{4}$/,
+                                message: 'The series must be 4 digits',
+                              },
+                            })}
+                            placeholder='0000'
+                            className={`customize-card__input ${errors.passportSeries ? 'customize-card__input--error' : ''}`}
+                          />
+                          {renderIcon('passportSeries')}
+                        </div>
+                        {errors.passportSeries && (
+                          <p className='customize-card__error'>The series must be 4 digits</p>
+                        )}
+                      </div>
+
+                      <div className='customize-card__field'>
+                        <label className='customize-card__label' htmlFor='passportNumber'>
+                          Your passport number <span>*</span>
+                        </label>
+                        <div className='customize-card__input-wrap'>
+                          <input
+                            id='passportNumber'
+                            {...register('passportNumber', {
+                              required: 'Required',
+                              pattern: {
+                                value: /^\d{6}$/,
+                                message: 'The number must be 6 digits',
+                              },
+                            })}
+                            placeholder='000000'
+                            className={`customize-card__input ${errors.passportNumber ? 'customize-card__input--error' : ''}`}
+                          />
+                          {renderIcon('passportNumber')}
+                        </div>
+                        {errors.passportNumber && (
+                          <p className='customize-card__error'>The series must be 6 digits</p>
+                        )}
+                      </div>
                     </div>
-                    {errors.firstName && (
-                      <p className='customize-card__error'>{errors.firstName.message}</p>
-                    )}
-                  </div>
-
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='patronymic'>
-                      Your patronymic
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <input
-                        id='patronymic'
-                        {...register('patronymic', {
-                          validate: (value) => {
-                            const v = (value || '').trim();
-
-                            if (v === '') return true;
-                            if (v.length < 4) return 'Minimum 4 characters';
-                            if (!/^[A-Za-z'-]+$/.test(v)) return 'Only Latin letters allowed';
-
-                            return true;
-                          },
-                        })}
-                        placeholder='For Example Victorovich'
-                        className={`customize-card__input ${errors.patronymic ? 'customize-card__input--error' : ''}`}
-                      />
-                      {renderIcon('patronymic')}
-                    </div>
-                    {errors.patronymic && (
-                      <p className='customize-card__error'>{errors.patronymic.message}</p>
-                    )}
-                  </div>
-
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='term'>
-                      Select term <span>*</span>
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <select id='term' {...register('term')} className='customize-card__input'>
-                        <option value='6'>6 month</option>
-                        <option value='12'>12 month</option>
-                        <option value='18'>18 month</option>
-                        <option value='24'>24 month</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='email'>
-                      Your email <span>*</span>
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <input
-                        id='email'
-                        {...register('email', {
-                          required: 'Email required',
-                          pattern: {
-                            value: /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{2,}\.[a-zA-Z]{2,}$/,
-                            message: 'Incorrect email address',
-                          },
-                        })}
-                        placeholder='test@gmail.com'
-                        className={`customize-card__input ${errors.email ? 'customize-card__input--error' : ''}`}
-                      />
-                      {renderIcon('email')}
-                    </div>
-                    {errors.email && (
-                      <p className='customize-card__error'>Incorrect email address</p>
-                    )}
-                  </div>
-
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='birth'>
-                      Your date of birth <span>*</span>
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <input
-                        id='birth'
-                        type={dateInputType}
-                        onFocus={() => setDateInputType('date')}
-                        placeholder='Select Date and Time'
-                        min={getMinBirthdate()}
-                        max={getMaxBirthdate()}
-                        {...register('birth', {
-                          required: 'Date is required',
-                          validate: (v) => {
-                            const date = new Date(v);
-                            if (isNaN(date.getTime())) return 'Invalid date';
-
-                            const now = new Date();
-                            const birthYear = date.getFullYear();
-                            const currentYear = now.getFullYear();
-
-                            const age = currentYear - birthYear;
-
-                            if (age < 18) return 'You must be at least 18 years old';
-                            if (age > 75) return 'You must be younger than 75 years old';
-
-                            return true;
-                          },
-                        })}
-                        className={`customize-card__input ${errors.birth ? 'customize-card__input--error' : ''}`}
-                      />
-
-                      {renderIcon('birth')}
-                    </div>
-
-                    {errors.birth && (
-                      <p className='customize-card__error'>Incorrect date of birth</p>
-                    )}
-                  </div>
-
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='passportSeries'>
-                      Your passport series <span>*</span>
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <input
-                        id='passportSeries'
-                        {...register('passportSeries', {
-                          required: 'Required',
-                          pattern: {
-                            value: /^\d{4}$/,
-                            message: 'The series must be 4 digits',
-                          },
-                        })}
-                        placeholder='0000'
-                        className={`customize-card__input ${errors.passportSeries ? 'customize-card__input--error' : ''}`}
-                      />
-                      {renderIcon('passportSeries')}
-                    </div>
-                    {errors.passportSeries && (
-                      <p className='customize-card__error'>The series must be 4 digits</p>
-                    )}
-                  </div>
-
-                  <div className='customize-card__field'>
-                    <label className='customize-card__label' htmlFor='passportNumber'>
-                      Your passport number <span>*</span>
-                    </label>
-                    <div className='customize-card__input-wrap'>
-                      <input
-                        id='passportNumber'
-                        {...register('passportNumber', {
-                          required: 'Required',
-                          pattern: {
-                            value: /^\d{6}$/,
-                            message: 'The number must be 6 digits',
-                          },
-                        })}
-                        placeholder='000000'
-                        className={`customize-card__input ${errors.passportNumber ? 'customize-card__input--error' : ''}`}
-                      />
-                      {renderIcon('passportNumber')}
-                    </div>
-                    {errors.passportNumber && (
-                      <p className='customize-card__error'>The series must be 6 digits</p>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
-          </Form>
-        </FormProvider>
-        {/* <OfferCard /> */}
+                  </>
+                )}
+              </Form>
+            </FormProvider>
+          </>
+        )}
       </div>
     </section>
   );

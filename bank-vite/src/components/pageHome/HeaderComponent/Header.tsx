@@ -21,7 +21,7 @@ const Header: React.FC = () => {
           <nav className='header__nav'>
             <ul className='header__list'>
               <li className='header__item'>
-                <NavLink to='/credit-card' className={getNavLinkClass}>
+                <NavLink to='/loan' className={getNavLinkClass}>
                   Credit card
                 </NavLink>
               </li>

@@ -17,7 +17,7 @@ function App() {
         <h1 className='visually-hidden'>Get your own bank card</h1>
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/credit-card' element={<CreditCard />} />
+          <Route path='/loan' element={<CreditCard />} />
           <Route path='/product' element={<Product />} />
           <Route path='/account' element={<Account />} />
           <Route path='/resources' element={<Resources />} />

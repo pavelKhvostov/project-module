@@ -29,9 +29,16 @@
   }
 
   &__text {
+    display: flex;
+    gap: 8px;
+    align-items: center;
     font-size: 16px;
     line-height: 112%;
     letter-spacing: 0.02em;
     color: #1c1c1e;
+  }
+
+  &__btn {
+    padding: 16px 50px;
   }
 }

@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './_credit-hero.scss';
 import Button from '@/components/ui/ButtonComponent/Button';
 import imgCard1 from '@/assets/img/card-1.jpg';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
+import { setOffers } from '@/redux/slices/offerSlices';
+import { RootState } from '@/redux/store';
+import { useSelector } from 'react-redux';
 
-interface HeroProps {
+interface IHeroProps {
   onApplyClick: () => void;
 }
 
-const Hero: React.FC<HeroProps> = ({ onApplyClick }) => {
+const Hero: React.FC<IHeroProps> = ({ onApplyClick }) => {
+  const offers = useSelector((state: RootState) => state.offers.offers);
+  const isSubmitted = useSelector((state: RootState) => state.offers.isSubmitted);
+
   return (
     <section className='credit-hero'>
       <div className='container'>
@@ -46,7 +52,11 @@ const Hero: React.FC<HeroProps> = ({ onApplyClick }) => {
               </li>
             </ul>
             <Button className='credit-hero__btn' onClick={onApplyClick}>
-              Apply for card
+              {isSubmitted
+                ? 'Continue registration'
+                : offers.length > 0
+                  ? 'Choose an offer'
+                  : 'Apply for card'}
             </Button>
           </div>
           <div className='credit-hero__right'>
