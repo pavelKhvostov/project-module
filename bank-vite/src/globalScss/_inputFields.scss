@@ -1,0 +1,63 @@
+.input-field {
+  &__label {
+    margin: 0 5px 8px 0;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 100%;
+    color: #1a202c;
+
+    span {
+      font-family: 'Ubuntu';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 100%;
+      color: #ff0000;
+    }
+  }
+
+  &__input-wrap {
+    position: relative;
+  }
+
+  &__input-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &__input {
+    width: 100%;
+    background: #f9f5e3;
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    border-radius: 6px;
+    padding: 13px 16px;
+    font-size: 14px;
+    line-height: 100%;
+    color: #000000;
+
+    &:focus-visible {
+      outline: 1px solid #5b35d5;
+    }
+
+    &::placeholder {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 100%;
+      color: #808080;
+    }
+
+    &--error {
+      outline: 1px solid #ff5631;
+    }
+  }
+
+  &__error {
+    margin: 0;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 100%;
+    color: #ff5631;
+  }
+}

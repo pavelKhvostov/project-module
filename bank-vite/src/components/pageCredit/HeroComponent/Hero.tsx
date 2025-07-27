@@ -6,6 +6,7 @@ import Tooltip from '@/components/ui/Tooltip/Tooltip';
 import { setOffers } from '@/redux/slices/offerSlices';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 interface IHeroProps {
   onApplyClick: () => void;
@@ -14,6 +15,26 @@ interface IHeroProps {
 const Hero: React.FC<IHeroProps> = ({ onApplyClick }) => {
   const offers = useSelector((state: RootState) => state.offers.offers);
   const isSubmitted = useSelector((state: RootState) => state.offers.isSubmitted);
+  const selectedApplicationId = useSelector(
+    (state: RootState) => state.offers.selectedApplicationId,
+  );
+
+  const [isAppIdValid, setIsAppIdValid] = useState(false);
+
+  useEffect(() => {
+    const savedAppId = localStorage.getItem('SelectedAppId');
+    if (savedAppId && String(selectedApplicationId) === savedAppId) {
+      setIsAppIdValid(true);
+    } else {
+      setIsAppIdValid(false);
+    }
+  }, [selectedApplicationId]);
+
+  const buttonText = isSubmitted
+    ? 'Continue registration'
+    : offers.length > 0
+      ? 'Choose an offer'
+      : 'Apply for card';
 
   return (
     <section className='credit-hero'>
@@ -35,7 +56,7 @@ const Hero: React.FC<IHeroProps> = ({ onApplyClick }) => {
                 </Tooltip>
               </li>
               <li className='credit-hero__item'>
-                <Tooltip text='Over the limit willaccrue percent' position='bottom'>
+                <Tooltip text='Over the limit will accrue percent' position='bottom'>
                   <span>
                     <span className='credit-hero__top'>Up to 600 000 ₽</span>
                     <span className='credit-hero__bottom'>Credit limit</span>
@@ -51,14 +72,20 @@ const Hero: React.FC<IHeroProps> = ({ onApplyClick }) => {
                 </Tooltip>
               </li>
             </ul>
-            <Button className='credit-hero__btn' onClick={onApplyClick}>
-              {isSubmitted
-                ? 'Continue registration'
-                : offers.length > 0
-                  ? 'Choose an offer'
-                  : 'Apply for card'}
-            </Button>
+
+            {isAppIdValid ? (
+              <Link to={`/loan/${selectedApplicationId}`}>
+                <Button className='credit-hero__btn' onClick={onApplyClick}>
+                  {buttonText}
+                </Button>
+              </Link>
+            ) : (
+              <Button className='credit-hero__btn' onClick={onApplyClick}>
+                {buttonText}
+              </Button>
+            )}
           </div>
+
           <div className='credit-hero__right'>
             <img className='credit-hero__img' width={380} height={227} src={imgCard1} alt='card' />
           </div>

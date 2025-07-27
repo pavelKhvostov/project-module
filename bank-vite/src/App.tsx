@@ -8,6 +8,8 @@ import Product from '@/pages/Product';
 import Account from '@/pages/Account';
 import Resources from '@/pages/Resources';
 import NotFoundPage from './pages/NotFound';
+import Application from './components/pageCredit/ApplicationId/Application';
+import Document from './components/pageCredit/Document/Document';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/loan' element={<CreditCard />} />
+          <Route path='/loan/:applicationId' element={<Application />} />
+          <Route path='/loan/:applicationId/document' element={<Document />} />
           <Route path='/product' element={<Product />} />
           <Route path='/account' element={<Account />} />
           <Route path='/resources' element={<Resources />} />

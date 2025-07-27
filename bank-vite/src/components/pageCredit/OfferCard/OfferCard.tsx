@@ -19,7 +19,7 @@ interface IOffer {
 
 interface IOfferCardProps {
   offer: IOffer;
-  onSelect: (applicationId: number) => void;
+  onSelect: (offer: IOffer) => void;
 }
 
 const OfferCard: React.FC<IOfferCardProps> = ({ offer, onSelect }) => {
@@ -64,7 +64,7 @@ const OfferCard: React.FC<IOfferCardProps> = ({ offer, onSelect }) => {
         className='offer-card__btn'
         children='Select'
         type='button'
-        onClick={() => onSelect(offer.applicationId)}
+        onClick={() => onSelect(offer)}
       />
     </div>
   );

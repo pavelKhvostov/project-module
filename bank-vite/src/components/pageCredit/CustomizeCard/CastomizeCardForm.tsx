@@ -56,65 +56,42 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState<number>(150000);
   const isSubmitted = useSelector((state: RootState) => state.offers.isSubmitted);
-  const dispatch = useDispatch();
   const offers = useSelector((state: RootState) => state.offers.offers);
+  const dispatch = useDispatch();
 
-  const handleOfferSelect = async (applicationId: number) => {
-    try {
-      await axios.post('http://localhost:8080/application/apply', { applicationId });
-      dispatch(setIsFlagSubmitted(true));
-      dispatch(setSelectedApplicationId(applicationId));
-      localStorage.setItem('Submitted', 'true');
-      localStorage.setItem('SelectedAppId', String(applicationId));
-    } catch (err) {
-      console.error('Ошибка при выборе предложения:', err);
-    }
-  };
-
-  const methods = useForm<FormValues>({
-    mode: 'onSubmit',
-    defaultValues: {
-      term: '6',
-    },
-  });
-
+  const methods = useForm<FormValues>({ mode: 'onSubmit', defaultValues: { term: '6' } });
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = methods;
 
   const renderIcon = (fieldName: keyof FormValues) => {
     const value = watch(fieldName)?.toString().trim();
-    if (errors[fieldName]) {
-      return <img src={errorSvg} alt='error' className='customize-card__input-icon' />;
-    }
-    if (value) {
-      return <img src={checkSvg} alt='valid' className='customize-card__input-icon' />;
-    }
+    if (errors[fieldName])
+      return <img src={errorSvg} alt='error' className='input-field__input-icon' />;
+    if (value) return <img src={checkSvg} alt='valid' className='input-field__input-icon' />;
     return null;
   };
 
   useEffect(() => {
     const savedOffers = localStorage.getItem('offers');
-    const formSubmitted = localStorage.getItem('formSubmitted') === 'true';
-
-    if (savedOffers && formSubmitted) {
+    if (savedOffers) {
       try {
-        const parsedOffers = JSON.parse(savedOffers);
-        if (Array.isArray(parsedOffers)) {
-          dispatch(setOffers(parsedOffers));
+        const parsed = JSON.parse(savedOffers);
+        if (Array.isArray(parsed)) {
+          dispatch(setOffers(parsed));
         }
-      } catch (err) {
-        console.error('Ошибка при чтении offers из localStorage:', err);
+      } catch (e) {
+        console.error('Ошибка при чтении offers из localStorage:', e);
       }
     }
   }, []);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
-
     const payload: ApplicationPayload = {
       amount,
       term: Number(data.term),
@@ -132,16 +109,68 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      dispatch(setOffers(response.data));
+      const offers = response.data;
+      const applicationId = offers?.[0]?.applicationId;
 
-      localStorage.setItem('offers', JSON.stringify(response.data));
-      localStorage.setItem('formSubmitted', 'true');
+      if (applicationId) {
+        // записываем уникальный ID
+        const rawHistory = localStorage.getItem('ApplicationHistory');
+        const history: number[] = rawHistory ? JSON.parse(rawHistory) : [];
+        if (!history.includes(applicationId)) {
+          history.push(applicationId);
+          localStorage.setItem('ApplicationHistory', JSON.stringify(history));
+        }
+      }
+
+      dispatch(setOffers(offers));
+      localStorage.setItem('offers', JSON.stringify(offers));
     } catch (error) {
-      console.error('Submit failed:', error);
+      console.error('Ошибка при отправке формы:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleOfferSelect = async (offer: {
+    applicationId: number;
+    requestedAmount: number;
+    term: number;
+    rate: number;
+    isInsuranceEnabled: boolean;
+    isSalaryClient: boolean;
+  }) => {
+    try {
+      await axios.post('http://localhost:8080/application/apply', offer, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      dispatch(setIsFlagSubmitted(true));
+      dispatch(setSelectedApplicationId(offer.applicationId));
+      localStorage.setItem('Submitted', 'true');
+      localStorage.setItem('SelectedAppId', String(offer.applicationId));
+      localStorage.setItem(`registrationSubmitted_${offer.applicationId}`, 'true');
+
+      Object.keys(localStorage).forEach((key) => {
+        const keep =
+          key === 'SelectedAppId' ||
+          key === `registrationSubmitted_${offer.applicationId}` ||
+          key === 'ApplicationHistory' ||
+          key.startsWith('ApplicationData_') ||
+          key === 'currency_rates_cache' ||
+          key === 'isSubscribed' ||
+          key === 'subscribedEmail';
+
+        if (!keep) {
+          localStorage.removeItem(key);
+        }
+      });
+      dispatch(setOffers([]));
+      reset();
+    } catch (err) {
+      console.error('Ошибка при выборе предложения:', err);
+    }
+  };
+
   return (
     <section className='customize-card' ref={ref}>
       <div className='container'>
@@ -179,10 +208,10 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                     <h2 className='customize-card__title'>Contact Information</h2>
                     <div className='customize-card__fields'>
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='lastName'>
+                        <label className='input-field__label' htmlFor='lastName'>
                           Your last name <span>*</span>
                         </label>
-                        <div className='customize-card__input-wrap'>
+                        <div className='input-field__input-wrap'>
                           <input
                             id='lastName'
                             {...register('lastName', {
@@ -195,20 +224,20 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                               },
                             })}
                             placeholder='For Example Doe'
-                            className={`customize-card__input ${errors.lastName ? 'customize-card__input--error' : ''}`}
+                            className={`input-field__input ${errors.lastName ? 'input-field__input--error' : ''}`}
                           />
                           {renderIcon('lastName')}
                         </div>
                         {errors.lastName && (
-                          <p className='customize-card__error'>{errors.lastName.message}</p>
+                          <p className='input-field__error'>{errors.lastName.message}</p>
                         )}
                       </div>
 
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='firstName'>
+                        <label className='input-field__label' htmlFor='firstName'>
                           Your first name <span>*</span>
                         </label>
-                        <div className='customize-card__input-wrap'>
+                        <div className='input-field__input-wrap'>
                           <input
                             id='firstName'
                             {...register('firstName', {
@@ -221,20 +250,20 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                               },
                             })}
                             placeholder='For Example John'
-                            className={`customize-card__input ${errors.firstName ? 'customize-card__input--error' : ''}`}
+                            className={`input-field__input ${errors.firstName ? 'input-field__input--error' : ''}`}
                           />
                           {renderIcon('firstName')}
                         </div>
                         {errors.firstName && (
-                          <p className='customize-card__error'>{errors.firstName.message}</p>
+                          <p className='input-field__error'>{errors.firstName.message}</p>
                         )}
                       </div>
 
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='patronymic'>
+                        <label className='input-field__label' htmlFor='patronymic'>
                           Your patronymic
                         </label>
-                        <div className='customize-card__input-wrap'>
+                        <div className='input-field__input-wrap'>
                           <input
                             id='patronymic'
                             {...register('patronymic', {
@@ -249,21 +278,21 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                               },
                             })}
                             placeholder='For Example Victorovich'
-                            className={`customize-card__input ${errors.patronymic ? 'customize-card__input--error' : ''}`}
+                            className={`input-field__input ${errors.patronymic ? 'input-field__input--error' : ''}`}
                           />
                           {renderIcon('patronymic')}
                         </div>
                         {errors.patronymic && (
-                          <p className='customize-card__error'>{errors.patronymic.message}</p>
+                          <p className='input-field__error'>{errors.patronymic.message}</p>
                         )}
                       </div>
 
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='term'>
+                        <label className='input-field__label' htmlFor='term'>
                           Select term <span>*</span>
                         </label>
-                        <div className='customize-card__input-wrap'>
-                          <select id='term' {...register('term')} className='customize-card__input'>
+                        <div className='input-field__input-wrap'>
+                          <select id='term' {...register('term')} className='input-field__input'>
                             <option value='6'>6 month</option>
                             <option value='12'>12 month</option>
                             <option value='18'>18 month</option>
@@ -273,10 +302,10 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                       </div>
 
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='email'>
+                        <label className='input-field__label' htmlFor='email'>
                           Your email <span>*</span>
                         </label>
-                        <div className='customize-card__input-wrap'>
+                        <div className='input-field__input-wrap'>
                           <input
                             id='email'
                             {...register('email', {
@@ -287,20 +316,20 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                               },
                             })}
                             placeholder='test@gmail.com'
-                            className={`customize-card__input ${errors.email ? 'customize-card__input--error' : ''}`}
+                            className={`input-field__input ${errors.email ? 'input-field__input--error' : ''}`}
                           />
                           {renderIcon('email')}
                         </div>
                         {errors.email && (
-                          <p className='customize-card__error'>Incorrect email address</p>
+                          <p className='input-field__error'>Incorrect email address</p>
                         )}
                       </div>
 
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='birth'>
+                        <label className='input-field__label' htmlFor='birth'>
                           Your date of birth <span>*</span>
                         </label>
-                        <div className='customize-card__input-wrap'>
+                        <div className='input-field__input-wrap'>
                           <input
                             id='birth'
                             type={dateInputType}
@@ -326,22 +355,22 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                                 return true;
                               },
                             })}
-                            className={`customize-card__input ${errors.birth ? 'customize-card__input--error' : ''}`}
+                            className={`input-field__input ${errors.birth ? 'input-field__input--error' : ''}`}
                           />
 
                           {renderIcon('birth')}
                         </div>
 
                         {errors.birth && (
-                          <p className='customize-card__error'>Incorrect date of birth</p>
+                          <p className='input-field__error'>Incorrect date of birth</p>
                         )}
                       </div>
 
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='passportSeries'>
+                        <label className='input-field__label' htmlFor='passportSeries'>
                           Your passport series <span>*</span>
                         </label>
-                        <div className='customize-card__input-wrap'>
+                        <div className='input-field__input-wrap'>
                           <input
                             id='passportSeries'
                             {...register('passportSeries', {
@@ -352,20 +381,20 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                               },
                             })}
                             placeholder='0000'
-                            className={`customize-card__input ${errors.passportSeries ? 'customize-card__input--error' : ''}`}
+                            className={`input-field__input ${errors.passportSeries ? 'input-field__input--error' : ''}`}
                           />
                           {renderIcon('passportSeries')}
                         </div>
                         {errors.passportSeries && (
-                          <p className='customize-card__error'>The series must be 4 digits</p>
+                          <p className='input-field__error'>The series must be 4 digits</p>
                         )}
                       </div>
 
                       <div className='customize-card__field'>
-                        <label className='customize-card__label' htmlFor='passportNumber'>
+                        <label className='input-field__label' htmlFor='passportNumber'>
                           Your passport number <span>*</span>
                         </label>
-                        <div className='customize-card__input-wrap'>
+                        <div className='input-field__input-wrap'>
                           <input
                             id='passportNumber'
                             {...register('passportNumber', {
@@ -376,12 +405,12 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
                               },
                             })}
                             placeholder='000000'
-                            className={`customize-card__input ${errors.passportNumber ? 'customize-card__input--error' : ''}`}
+                            className={`input-field__input ${errors.passportNumber ? 'input-field__input--error' : ''}`}
                           />
                           {renderIcon('passportNumber')}
                         </div>
                         {errors.passportNumber && (
-                          <p className='customize-card__error'>The series must be 6 digits</p>
+                          <p className='input-field__error'>The series must be 6 digits</p>
                         )}
                       </div>
                     </div>
