@@ -1,0 +1,117 @@
+.document {
+  padding-top: 24px;
+  margin: 0 0 100px;
+  &__table-wrap {
+    max-height: 300px; // высота для ~6 строк
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      font-size: 12px;
+      line-height: 147.4%;
+      letter-spacing: 0.02em;
+      color: #4a5568;
+      text-transform: uppercase;
+    }
+
+    td {
+      font-size: 12px;
+      line-height: 147.4%;
+      letter-spacing: 0.02em;
+      color: #1a202c;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 20px;
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+
+    input[type='checkbox'] {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__btn {
+    padding: 8px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &--deny {
+      background-color: #e74c3c;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 112%;
+      letter-spacing: 0.02em;
+
+      &:hover {
+        background-color: #c0392b;
+      }
+    }
+
+    &--send {
+      background-color: #003cff;
+      color: #fff;
+      font-weight: 700;
+
+      font-size: 16px;
+      line-height: 112%;
+      letter-spacing: 0.02em;
+
+      &:hover {
+        background-color: #7796c0;
+      }
+
+      &:disabled {
+        background-color: #cccccc;
+        color: #666;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

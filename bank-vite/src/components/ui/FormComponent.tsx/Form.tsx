@@ -3,14 +3,24 @@ import Button from '../ButtonComponent/Button';
 import './_form.scss';
 
 interface IFormCardProps {
+  className?: string;
+  title: string;
   step: number;
   children: React.ReactNode;
-  onSubmit: () => void;
+  onSubmit?: () => void;
   amount?: number;
   setAmount?: (val: number) => void;
 }
 
-const Form: React.FC<IFormCardProps> = ({ step, children, onSubmit, amount, setAmount }) => {
+const Form: React.FC<IFormCardProps> = ({
+  className,
+  title,
+  step,
+  children,
+  onSubmit,
+  amount,
+  setAmount,
+}) => {
   const MIN_AMOUNT = 15000;
   const MAX_AMOUNT = 600000;
 
@@ -51,12 +61,12 @@ const Form: React.FC<IFormCardProps> = ({ step, children, onSubmit, amount, setA
   };
 
   return (
-    <form className='form' onSubmit={onSubmit}>
+    <form className={`form ${className}`} onSubmit={onSubmit}>
       <div className='form__loan-controls'>
         <div className='form__header'>
           <div className='form__wrap-left'>
             <div className='form__wrap-top'>
-              <h2 className='form__title'>Customize your card</h2>
+              <h2 className='form__title'>{title}</h2>
               <span className='form__step'>{`Step ${step} of 5`}</span>
             </div>
             {step === 1 && (
@@ -124,10 +134,11 @@ const Form: React.FC<IFormCardProps> = ({ step, children, onSubmit, amount, setA
       </div>
 
       <div className='form__body'>{children}</div>
-
-      <Button className='form__button' type='submit'>
-        Continue
-      </Button>
+      {step >= 3 ? null : (
+        <Button className='form__button' type='submit'>
+          Continue
+        </Button>
+      )}
     </form>
   );
 };

@@ -194,6 +194,7 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
           <>
             <FormProvider {...methods}>
               <Form
+                title='Customize your card'
                 step={1}
                 onSubmit={handleSubmit(onSubmit)}
                 amount={amount}

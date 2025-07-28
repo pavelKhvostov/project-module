@@ -10,6 +10,8 @@ import Resources from '@/pages/Resources';
 import NotFoundPage from './pages/NotFound';
 import Application from './components/pageCredit/ApplicationId/Application';
 import Document from './components/pageCredit/Document/Document';
+import DocumentSign from './components/pageCredit/DocumentSign/DocumentSign';
+import Code from './components/pageCredit/Code/Code';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path='/loan' element={<CreditCard />} />
           <Route path='/loan/:applicationId' element={<Application />} />
           <Route path='/loan/:applicationId/document' element={<Document />} />
+          <Route path='/loan/:applicationId/document/sign' element={<DocumentSign />} />
+          <Route path='/loan/:applicationId/code' element={<Code />} />
           <Route path='/product' element={<Product />} />
           <Route path='/account' element={<Account />} />
           <Route path='/resources' element={<Resources />} />

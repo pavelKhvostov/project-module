@@ -125,10 +125,17 @@ const Application = () => {
     <section className='application'>
       <div className='container'>
         {isRegistrationSent ? (
-          <LoanMessage />
+          <LoanMessage
+            title='Wait for a decision on the application'
+            text='The answer will come to your mail within 10 minutes'
+          />
         ) : (
           <FormProvider {...methods}>
-            <Form step={2} onSubmit={handleSubmit(onSubmit)}>
+            <Form
+              title='Continuation of the application'
+              step={2}
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <div className='application__fields'>
                 <div className='application__top'>
                   <div className='application__field'>
