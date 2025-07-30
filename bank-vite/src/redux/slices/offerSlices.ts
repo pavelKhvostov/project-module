@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface IOffer {
+export interface IOffer {
   applicationId: number;
   isInsuranceEnabled: boolean;
   isSalaryClient: boolean;
@@ -11,39 +11,44 @@ interface IOffer {
   totalAmount: number;
 }
 
-interface IOffersState {
+export interface IOffersState {
   offers: IOffer[];
-  isSubmitted: boolean;
-  selectedApplicationId: number | null;
+  selectedOffer: IOffer | null;
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: IOffersState = {
   offers: [],
-  isSubmitted: localStorage.getItem('Submitted') === 'true',
-  selectedApplicationId: localStorage.getItem('SelectedAppId')
-    ? Number(localStorage.getItem('SelectedAppId'))
-    : null,
+  selectedOffer: null,
+  loading: false,
+  error: null,
 };
 
-const offersSlice = createSlice({
+const offerSlice = createSlice({
   name: 'offers',
   initialState,
   reducers: {
     setOffers(state, action: PayloadAction<IOffer[]>) {
       state.offers = action.payload;
+      state.loading = false;
+    },
+    selectOffer(state, action: PayloadAction<IOffer>) {
+      state.selectedOffer = action.payload;
     },
     clearOffers(state) {
       state.offers = [];
+      state.selectedOffer = null;
     },
-    setIsFlagSubmitted(state, action: PayloadAction<boolean>) {
-      state.isSubmitted = action.payload;
+    setLoading(state, action: PayloadAction<boolean>) {
+      state.loading = action.payload;
     },
-    setSelectedApplicationId(state, action: PayloadAction<number>) {
-      state.selectedApplicationId = action.payload;
+    setError(state, action: PayloadAction<string | null>) {
+      state.error = action.payload;
+      state.loading = false;
     },
   },
 });
 
-export const { setOffers, clearOffers, setIsFlagSubmitted, setSelectedApplicationId } =
-  offersSlice.actions;
-export default offersSlice.reducer;
+export const { setOffers, selectOffer, clearOffers, setLoading, setError } = offerSlice.actions;
+export default offerSlice.reducer;

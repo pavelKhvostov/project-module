@@ -4,7 +4,7 @@ import Button from '@/components/ui/ButtonComponent/Button';
 import imgCard1 from '@/assets/img/card-1.jpg';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
 import { setOffers } from '@/redux/slices/offerSlices';
-import { RootState } from '@/redux/store';
+import { RootState } from '@/redux/store/store';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 

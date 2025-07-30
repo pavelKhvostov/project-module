@@ -8,6 +8,16 @@ import errorSvg from '@/assets/img/Close_round_fill.svg';
 import checkSvg from '@/assets/img/Check_fill.svg';
 import Form from '@/components/ui/FormComponent.tsx/Form';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store/store';
+import {
+  resetScoring,
+  setScoringData,
+  setScoringResult,
+  setScoringStatus,
+} from '@/redux/slices/scoringSlice';
+import { setStatus } from '@/redux/slices/applicationSlice';
+
 interface IFormValues {
   gender: 'MALE' | 'FAMALE';
   maritalStatus: 'MARRIED' | 'DIVORCED' | 'SINGLE' | 'WIDOW_WIDOWER';
@@ -22,28 +32,12 @@ interface IFormValues {
   workExperienceCurrent: number;
 }
 
-const clearLocalStorageExcept = (appId: string) => {
-  Object.keys(localStorage).forEach((key) => {
-    const shouldKeep =
-      key === `registrationSubmitted_${appId}` ||
-      key === 'SelectedAppId' ||
-      key === 'ApplicationHistory' ||
-      key.startsWith('ApplicationData_') ||
-      key === 'currency_rates_cache' ||
-      key === 'isSubscribed' ||
-      key === 'subscribedEmail';
-
-    if (!shouldKeep) {
-      localStorage.removeItem(key);
-    }
-  });
-};
-
 const Application = () => {
-  const [isRegistrationSent, setIsRegistrationSent] = useState(false);
-  const [isValid, setIsValid] = useState<boolean | null>(null);
   const [dateInputType, setDateInputType] = useState<'text' | 'date'>('text');
   const { applicationId } = useParams();
+
+  const dispatch = useDispatch();
+  const status = useSelector((state: RootState) => state.application.status);
 
   const methods = useForm<IFormValues>();
   const {
@@ -51,6 +45,7 @@ const Application = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = methods;
 
   const renderIcon = (fieldName: keyof IFormValues) => {
@@ -81,33 +76,45 @@ const Application = () => {
     };
 
     try {
-      const { data: appData } = await axios.get(
-        `http://localhost:8080/admin/application/${applicationId}`,
-      );
-
-      if (appData.status === 'CC_DENIED') {
-        localStorage.removeItem(`registrationSubmitted_${applicationId}`);
-        window.location.href = `/loan/`;
-        return;
-      }
+      dispatch(setScoringData(data));
+      dispatch(setScoringStatus('PENDING'));
+      dispatch(setStatus('SCORING_PENDING'));
 
       await axios.put(`http://localhost:8080/application/registration/${applicationId}`, payload, {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      localStorage.setItem(`registrationSubmitted_${applicationId}`, 'true');
-      localStorage.removeItem('SelectedAppId');
-      clearLocalStorageExcept(applicationId);
-      setIsRegistrationSent(true);
-
       const { data: finalAppData } = await axios.get(
         `http://localhost:8080/admin/application/${applicationId}`,
       );
-      localStorage.setItem(`ApplicationData_${finalAppData.id}`, JSON.stringify(finalAppData));
+
+      console.log('Final app data:', finalAppData);
+
+      if (finalAppData.status === 'CC_DENIED') {
+        dispatch(resetScoring());
+        dispatch(setStatus('IDLE'));
+
+        Object.keys(localStorage).forEach((key) => {
+          if (key === 'reduxState' || key === 'SelectedAppId') {
+            localStorage.removeItem(key);
+          }
+        });
+
+        window.location.href = '/';
+        return;
+      }
+
+      dispatch(setScoringResult(finalAppData));
+      dispatch(setStatus('APPROVED'));
+
+      reset();
     } catch (error) {
       console.error('Error submitting form:', error);
+      dispatch(setScoringStatus('FAILED'));
     }
   };
+
+  const [isValid, setIsValid] = useState<boolean | null>(null);
 
   useEffect(() => {
     const savedId = localStorage.getItem('SelectedAppId');
@@ -124,7 +131,7 @@ const Application = () => {
   return (
     <section className='application'>
       <div className='container'>
-        {isRegistrationSent ? (
+        {status === 'APPROVED' ? (
           <LoanMessage
             title='Wait for a decision on the application'
             text='The answer will come to your mail within 10 minutes'
@@ -223,8 +230,8 @@ const Application = () => {
                         onFocus={() => setDateInputType('date')}
                         onBlur={(e) => {
                           const originalBlur = register('passportIssueDate').onBlur;
-                          originalBlur && originalBlur(e); // вызываем встроенный onBlur из react-hook-form
-                          if (!e.target.value) setDateInputType('text'); // твоя логика
+                          originalBlur && originalBlur(e);
+                          if (!e.target.value) setDateInputType('text');
                         }}
                         className='input-field__input'
                       />
