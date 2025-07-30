@@ -210,7 +210,7 @@ const Application = () => {
                         type={dateInputType}
                         placeholder='Select Date and Time'
                         {...register('passportIssueDate', {
-                          required: 'Enter passport issue date',
+                          required: 'Incorrect date of passport issue date',
                           validate: (value) => {
                             const date = new Date(value);
                             const now = new Date();
