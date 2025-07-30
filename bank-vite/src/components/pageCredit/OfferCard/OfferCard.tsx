@@ -34,15 +34,15 @@ const OfferCard: React.FC<IOfferCardProps> = ({ offer, onSelect }) => {
       />
       <div className='offer-card__wrap'>
         <span className='offer-card__text'>
-          Requested amount: {offer.requestedAmount.toLocaleString()} ₽
+          Requested amount: {offer.requestedAmount.toLocaleString()}&nbsp;₽
         </span>
         <span className='offer-card__text'>
-          Total amount: {offer.totalAmount.toLocaleString()} ₽
+          Total amount: {offer.totalAmount.toLocaleString()}&nbsp;₽
         </span>
         <span className='offer-card__text'>For {offer.term} months</span>
         <span className='offer-card__text'>
           Monthly payment:{' '}
-          {offer.monthlyPayment.toLocaleString(undefined, { maximumFractionDigits: 2 })} ₽
+          {offer.monthlyPayment.toLocaleString(undefined, { maximumFractionDigits: 2 })}&nbsp;₽
         </span>
         <span className='offer-card__text'>Your rate: {offer.rate}%</span>
         <span className='offer-card__text'>

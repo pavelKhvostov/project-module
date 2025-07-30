@@ -150,7 +150,7 @@ const Application = () => {
                       >
                         <option value=''></option>
                         <option value='MALE'>Male</option>
-                        <option value='FAMALE'>Female</option>
+                        <option value='FAMALE'>Famale</option>
                       </select>
                     </div>
                     {errors.gender && <p className='input-field__error'>{errors.gender.message}</p>}
@@ -243,7 +243,8 @@ const Application = () => {
                       <input
                         type='text'
                         id='passportIssueBranch'
-                        placeholder='000000'
+                        placeholder='000-000'
+                        maxLength={7}
                         {...register('passportIssueBranch', {
                           required: 'The series must be 6 digits',
                           pattern: {
@@ -252,9 +253,19 @@ const Application = () => {
                           },
                         })}
                         className='input-field__input'
+                        onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                          let value = e.currentTarget.value.replace(/\D/g, '');
+
+                          if (value.length > 3) {
+                            value = value.slice(0, 3) + '-' + value.slice(3, 6);
+                          }
+
+                          e.currentTarget.value = value;
+                        }}
                       />
                       {renderIcon('passportIssueBranch')}
                     </div>
+
                     {errors.passportIssueBranch && (
                       <p className='input-field__error'>{errors.passportIssueBranch.message}</p>
                     )}
@@ -265,7 +276,7 @@ const Application = () => {
                 <div className='application__bottom'>
                   <div className='application__field'>
                     <label className='input-field__label' htmlFor='employmentStatus'>
-                      Employment status <span>*</span>
+                      Your employment status <span>*</span>
                     </label>
                     <div className='input-field__input-wrap'>
                       <select
@@ -367,8 +378,14 @@ const Application = () => {
                         max={99}
                         {...register('workExperienceTotal', {
                           required: 'Enter your work experience total',
-                          min: 0,
-                          max: 99,
+                          min: {
+                            value: 0,
+                            message: 'Value cannot be negative',
+                          },
+                          max: {
+                            value: 99,
+                            message: 'Value cannot exceed 99',
+                          },
                         })}
                         className='input-field__input'
                       />
@@ -391,8 +408,14 @@ const Application = () => {
                         max={99}
                         {...register('workExperienceCurrent', {
                           required: 'Enter your work experience current',
-                          min: 0,
-                          max: 99,
+                          min: {
+                            value: 0,
+                            message: 'Value cannot be negative',
+                          },
+                          max: {
+                            value: 99,
+                            message: 'Value cannot exceed 99',
+                          },
                         })}
                         className='input-field__input'
                       />

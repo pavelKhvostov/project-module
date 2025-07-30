@@ -37,6 +37,10 @@
     line-height: 100%;
     color: #000000;
 
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
     &:focus-visible {
       outline: 1px solid #5b35d5;
     }
@@ -50,6 +54,12 @@
 
     &--error {
       outline: 1px solid #ff5631;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
   }
 
