@@ -298,7 +298,7 @@ const Application = () => {
 
                   <div className='application__field'>
                     <label className='input-field__label' htmlFor='employerINN'>
-                      Employer INN <span>*</span>
+                      Your employer INN <span>*</span>
                     </label>
                     <div className='input-field__input-wrap'>
                       <input
@@ -323,7 +323,7 @@ const Application = () => {
 
                   <div className='application__field'>
                     <label className='input-field__label' htmlFor='salary'>
-                      Salary <span>*</span>
+                      Your salary <span>*</span>
                     </label>
                     <div className='input-field__input-wrap'>
                       <input
@@ -346,7 +346,7 @@ const Application = () => {
 
                   <div className='application__field'>
                     <label className='input-field__label' htmlFor='position'>
-                      Position <span>*</span>
+                      Your position<span>*</span>
                     </label>
                     <div className='input-field__input-wrap'>
                       <select
@@ -368,7 +368,7 @@ const Application = () => {
 
                   <div className='application__field'>
                     <label className='input-field__label' htmlFor='workExperienceTotal'>
-                      Total work experience <span>*</span>
+                      Your work experience total <span>*</span>
                     </label>
                     <div className='input-field__input-wrap'>
                       <input
@@ -398,7 +398,7 @@ const Application = () => {
 
                   <div className='application__field'>
                     <label className='input-field__label' htmlFor='workExperienceCurrent'>
-                      Current job experience <span>*</span>
+                      Your work experience current <span>*</span>
                     </label>
                     <div className='input-field__input-wrap'>
                       <input
