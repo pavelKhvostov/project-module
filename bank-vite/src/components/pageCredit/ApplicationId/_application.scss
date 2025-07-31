@@ -1,3 +1,5 @@
+@use '@/globalScss/_mixins' as *;
+
 .application {
   padding-top: 24px;
   margin: 0 0 100px;
@@ -36,6 +38,11 @@
     .application__field:nth-child(5) {
       grid-column: span 3;
     }
+
+    @include vp-1110 {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
 
   &__heading {
@@ -53,6 +60,10 @@
 
     .application__field {
       max-width: 396px;
+
+      @include vp-1110 {
+        max-width: 100%;
+      }
     }
   }
 }

@@ -10,6 +10,7 @@
     0px 0px 8px rgba(0, 0, 0, 0.08),
     0px 2px 4px rgba(0, 0, 0, 0.2);
   border-radius: 28px;
+  justify-content: space-between;
 
   &:hover,
   &:focus-visible {
@@ -41,5 +42,11 @@
 
   &__btn {
     padding: 16px 50px;
+  }
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
