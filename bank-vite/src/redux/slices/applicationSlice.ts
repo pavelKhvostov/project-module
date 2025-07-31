@@ -5,10 +5,11 @@ export type TApplicationStatus =
   | 'PRESCORING_PENDING'
   | 'PRESCORING_SUCCESS'
   | 'OFFER_SELECTED'
-  | 'SCORING_PENDING'
   | 'WAITING_RESULT'
   | 'APPROVED'
   | 'CC_DENIED'
+  | 'DOCS_FORMED'
+  | 'SIGN_PENDING'
   | 'COMPLETED';
 
 export interface IApplicationState {

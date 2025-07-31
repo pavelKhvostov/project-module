@@ -11,15 +11,15 @@ const FinalStep = () => {
 
   const handleClick = () => {
     if (applicationId) {
-      localStorage.removeItem(`ApplicationData_${applicationId}`);
-      localStorage.removeItem(`registrationSubmitted_${applicationId}`);
+      const currentId = Number(applicationId);
 
-      const history = JSON.parse(localStorage.getItem('ApplicationHistory') || '[]');
-      const updated = history.filter((id: string | number) => id.toString() !== applicationId);
-      localStorage.setItem('ApplicationHistory', JSON.stringify(updated));
+      localStorage.removeItem(`reduxState__${currentId}`);
 
-      if (localStorage.getItem('SelectedAppId') === applicationId) {
-        localStorage.removeItem('SelectedAppId');
+      const historyRaw = localStorage.getItem('SelectedAppIds');
+      if (historyRaw) {
+        const history: number[] = JSON.parse(historyRaw);
+        const updated = history.filter((id) => id !== currentId);
+        localStorage.setItem('SelectedAppIds', JSON.stringify(updated));
       }
     }
 

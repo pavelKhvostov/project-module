@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import Form from '@/components/ui/FormComponent.tsx/Form';
+import LoanMessage from '@/components/pageCredit/LoanMessag/LoanMessage';
 import Checkbox from '@/components/ui/Checkbox/Checkbox';
 import Modal from '@/components/ui/Modal/Modal';
-import LoanMessage from '@/components/pageCredit/LoanMessag/LoanMessage';
-
 import './_document.scss';
 import axios from 'axios';
+import { TApplicationStatus } from '@/redux/slices/applicationSlice';
 
 type SortDirection = 'asc' | 'desc';
 type SortKey =
@@ -18,23 +18,25 @@ type SortKey =
   | 'remainingDebt';
 
 const Document = () => {
+  const [statusId, setStatusId] = useState<TApplicationStatus>('IDLE');
   const [isDeleted, setIsDeleted] = useState(false);
-  const [isSent, setIsSent] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalStep, setModalStep] = useState<'confirm' | 'result'>('confirm');
-  const navigate = useNavigate();
-  const { applicationId } = useParams();
-  const storageKey = `ApplicationData_${applicationId}`;
-  const rawData = localStorage.getItem(storageKey);
-
   const [agree, setAgree] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('number');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalStep, setModalStep] = useState<'confirm' | 'result'>('confirm');
+  const [isValid, setIsValid] = useState<boolean | null>(null);
+
+  const navigate = useNavigate();
+  const { applicationId } = useParams();
 
   if (isDeleted) return <Navigate to='/' replace />;
 
-  const data = JSON.parse(rawData as string);
-  const schedule = [...(data?.credit?.paymentSchedule || [])];
+  const rawState = localStorage.getItem(`reduxState__${applicationId}`);
+  if (!rawState) return <Navigate to='/' replace />;
+
+  const state = JSON.parse(rawState);
+  const schedule = [...(state?.scoring?.result?.credit?.paymentSchedule || [])];
 
   const sortedSchedule = schedule.sort((a: any, b: any) => {
     const valA = a[sortKey];
@@ -61,7 +63,15 @@ const Document = () => {
   const handleSend = async () => {
     try {
       await axios.post(`http://localhost:8080/document/${applicationId}`);
-      setIsSent(true);
+      setStatusId('DOCS_FORMED');
+
+      const key = `reduxState__${applicationId}`;
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const state = JSON.parse(raw);
+        state.application.status = 'DOCS_FORMED';
+        localStorage.setItem(key, JSON.stringify(state));
+      }
     } catch (error) {
       console.error('Ошибка при отправке:', error);
     }
@@ -73,26 +83,18 @@ const Document = () => {
   };
 
   const handleModalClose = async () => {
-    if (modalStep === 'result') {
-      if (applicationId) {
-        try {
-          await axios.post(`http://localhost:8080/application/${applicationId}/deny`);
-        } catch (err) {
-          console.error('Ошибка при отказе от заявки:', err);
-        }
+    if (modalStep === 'result' && applicationId) {
+      try {
+        await axios.post(`http://localhost:8080/application/${applicationId}/deny`);
+      } catch (err) {
+        console.error('Ошибка при отказе от заявки:', err);
+      }
 
-        localStorage.removeItem(`registrationSubmitted_${applicationId}`);
-        localStorage.removeItem(`ApplicationData_${applicationId}`);
-
-        const history = JSON.parse(localStorage.getItem('ApplicationHistory') || '[]');
-        const updatedHistory = history.filter(
-          (id: string | number) => id.toString() !== applicationId,
-        );
-        localStorage.setItem('ApplicationHistory', JSON.stringify(updatedHistory));
-
-        if (localStorage.getItem('SelectedAppId') === applicationId) {
-          localStorage.removeItem('SelectedAppId');
-        }
+      localStorage.removeItem(`reduxState__${applicationId}`);
+      const idsRaw = localStorage.getItem('SelectedAppIds');
+      if (idsRaw) {
+        const ids = JSON.parse(idsRaw).filter((id: number) => id !== Number(applicationId));
+        localStorage.setItem('SelectedAppIds', JSON.stringify(ids));
       }
 
       setIsDeleted(true);
@@ -106,9 +108,29 @@ const Document = () => {
     setModalStep('result');
   };
 
+  useEffect(() => {
+    if (!applicationId) return;
+
+    const raw = localStorage.getItem(`reduxState__${applicationId}`);
+    if (raw) {
+      const state = JSON.parse(raw);
+      const currentStatus: TApplicationStatus = state.application?.status || 'IDLE';
+      setStatusId(currentStatus);
+
+      const allowedStatuses: TApplicationStatus[] = ['WAITING_RESULT', 'APPROVED', 'DOCS_FORMED'];
+      setIsValid(allowedStatuses.includes(currentStatus));
+    } else {
+      setIsValid(false);
+    }
+  }, [applicationId]);
+
+  if (isValid === null) return null;
+
+  if (!isValid) return <Navigate to='*' replace />;
+
   return (
     <>
-      {isSent ? (
+      {statusId === 'DOCS_FORMED' ? (
         <LoanMessage
           title='Documents are formed'
           text='Documents for signing will be sent to your email'
@@ -167,7 +189,6 @@ const Document = () => {
                     onChange={setAgree}
                     label='I agree with the payment schedule'
                   />
-
                   <button
                     type='button'
                     className='document__btn document__btn--send'

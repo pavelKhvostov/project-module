@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import FinalStep from '@/components/pageCredit/FinalStep/FinalStep';
 import './_code.scss';
 import ellipseImg from '@/assets/img/Ellipse.png';
 import Loader from '@/components/ui/Loader/Loader';
+import { TApplicationStatus } from '@/redux/slices/applicationSlice';
 
 const Code = () => {
   const { applicationId } = useParams();
@@ -12,27 +13,28 @@ const Code = () => {
   const [values, setValues] = useState(['', '', '', '']);
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
-  const [serverCode, setServerCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [statusId, setStatusId] = useState<TApplicationStatus>('IDLE');
+  const [isValid, setIsValid] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const fetchSesCode = async () => {
-      try {
-        const res = await axios.get(`http://localhost:8080/admin/application/${applicationId}`);
-        const code = res.data?.sesCode;
-        if (code) {
-          setServerCode(String(code));
-        } else {
-          setError('SES code not found');
-        }
-      } catch (err) {
-        setError('Failed to fetch SES code');
-        console.error(err);
-      }
-    };
+    if (!applicationId) return;
 
-    if (applicationId) {
-      fetchSesCode();
+    const raw = localStorage.getItem(`reduxState__${applicationId}`);
+    if (!raw) {
+      setIsValid(false);
+      return;
+    }
+
+    const state = JSON.parse(raw);
+    const currentStatus: TApplicationStatus = state.application?.status || 'IDLE';
+    setStatusId(currentStatus);
+
+    const allowedStatuses: TApplicationStatus[] = ['SIGN_PENDING', 'COMPLETED'];
+    setIsValid(allowedStatuses.includes(currentStatus));
+
+    if (currentStatus === 'COMPLETED') {
+      setIsSuccess(true);
     }
   }, [applicationId]);
 
@@ -64,35 +66,42 @@ const Code = () => {
   };
 
   const handleValidation = async (inputCode: string) => {
-    if (inputCode === serverCode) {
-      setIsLoading(true);
+    if (!applicationId) return;
 
-      try {
-        await axios.post(`http://localhost:8080/document/${applicationId}/sign/code`, inputCode, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+    console.log(inputCode);
 
-        setIsSuccess(true);
-      } catch (err) {
-        setError('Ошибка при отправке подтверждения');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
+    setIsLoading(true);
+    try {
+      await axios.post(
+        `http://localhost:8080/document/${applicationId}/sign/code`,
+        Number(inputCode),
+        { headers: { 'Content-Type': 'application/json' } },
+      );
+      setIsSuccess(true);
+      setStatusId('COMPLETED');
+
+      const key = `reduxState__${applicationId}`;
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const state = JSON.parse(raw);
+        state.application.status = 'COMPLETED';
+        localStorage.setItem(key, JSON.stringify(state));
       }
-    } else {
+    } catch (err) {
       setError('Invalid confirmation code');
       setValues(['', '', '', '']);
       inputsRef.current[0]?.focus();
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isValid === null) return null;
+  if (!isValid) return <Navigate to='*' replace />;
 
-  if (isSuccess) return <FinalStep />;
+  if (isLoading) return <Loader />;
+  if (isSuccess || statusId === 'COMPLETED') return <FinalStep />;
 
   return (
     <section className='code'>

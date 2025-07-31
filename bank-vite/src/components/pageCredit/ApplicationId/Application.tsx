@@ -8,36 +8,24 @@ import errorSvg from '@/assets/img/Close_round_fill.svg';
 import checkSvg from '@/assets/img/Check_fill.svg';
 import Form from '@/components/ui/FormComponent.tsx/Form';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/redux/store/store';
+import { useDispatch } from 'react-redux';
 import {
+  IFormValues,
   resetScoring,
   setScoringData,
   setScoringResult,
   setScoringStatus,
 } from '@/redux/slices/scoringSlice';
-import { setStatus } from '@/redux/slices/applicationSlice';
-
-interface IFormValues {
-  gender: 'MALE' | 'FAMALE';
-  maritalStatus: 'MARRIED' | 'DIVORCED' | 'SINGLE' | 'WIDOW_WIDOWER';
-  dependentAmount: number;
-  passportIssueDate: string;
-  passportIssueBranch: string;
-  employmentStatus: 'UNEMPLOYED' | 'SELF_EMPLOYED' | 'EMPLOYED' | 'BUSINESS_OWNER';
-  employerINN: string;
-  salary: number;
-  position: 'WORKER' | 'MID_MANAGER' | 'TOP_MANAGER' | 'OWNER';
-  workExperienceTotal: number;
-  workExperienceCurrent: number;
-}
+import { clearOffers } from '@/redux/slices/offerSlices';
+import { setStatus, TApplicationStatus } from '@/redux/slices/applicationSlice';
 
 const Application = () => {
   const [dateInputType, setDateInputType] = useState<'text' | 'date'>('text');
   const { applicationId } = useParams();
+  const [isValid, setIsValid] = useState<boolean | null>(null);
+  const [statusId, setStatusId] = useState<TApplicationStatus>('IDLE');
 
   const dispatch = useDispatch();
-  const status = useSelector((state: RootState) => state.application.status);
 
   const methods = useForm<IFormValues>();
   const {
@@ -78,7 +66,6 @@ const Application = () => {
     try {
       dispatch(setScoringData(data));
       dispatch(setScoringStatus('PENDING'));
-      dispatch(setStatus('SCORING_PENDING'));
 
       await axios.put(`http://localhost:8080/application/registration/${applicationId}`, payload, {
         headers: { 'Content-Type': 'application/json' },
@@ -88,17 +75,19 @@ const Application = () => {
         `http://localhost:8080/admin/application/${applicationId}`,
       );
 
-      console.log('Final app data:', finalAppData);
-
       if (finalAppData.status === 'CC_DENIED') {
         dispatch(resetScoring());
+        dispatch(clearOffers());
         dispatch(setStatus('IDLE'));
 
-        Object.keys(localStorage).forEach((key) => {
-          if (key === 'reduxState' || key === 'SelectedAppId') {
-            localStorage.removeItem(key);
-          }
-        });
+        const currentId = Number(applicationId);
+        localStorage.removeItem(`reduxState__${currentId}`);
+
+        const rawIds = localStorage.getItem('SelectedAppIds');
+        if (rawIds) {
+          const ids: number[] = JSON.parse(rawIds).filter((id: number) => id !== currentId);
+          localStorage.setItem('SelectedAppIds', JSON.stringify(ids));
+        }
 
         window.location.href = '/';
         return;
@@ -107,6 +96,11 @@ const Application = () => {
       dispatch(setScoringResult(finalAppData));
       dispatch(setStatus('APPROVED'));
 
+      setStatusId('APPROVED');
+
+      dispatch(clearOffers());
+      localStorage.removeItem(`Offers_${applicationId}`);
+
       reset();
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -114,16 +108,25 @@ const Application = () => {
     }
   };
 
-  const [isValid, setIsValid] = useState<boolean | null>(null);
-
   useEffect(() => {
-    const savedId = localStorage.getItem('SelectedAppId');
-    if (!savedId || savedId !== applicationId) {
-      setIsValid(false);
+    if (!applicationId) return;
+
+    const raw = localStorage.getItem(`reduxState__${applicationId}`);
+    if (raw) {
+      const state = JSON.parse(raw);
+      const currentStatus: TApplicationStatus = state.application?.status || 'IDLE';
+      setStatusId(currentStatus);
+
+      const allowedStatuses: TApplicationStatus[] = [
+        'OFFER_SELECTED',
+        'WAITING_RESULT',
+        'APPROVED',
+      ];
+      setIsValid(allowedStatuses.includes(currentStatus));
     } else {
-      setIsValid(true);
+      setIsValid(false);
     }
-  }, [applicationId]);
+  }, [applicationId, statusId]);
 
   if (isValid === null) return null;
   if (!isValid) return <Navigate to='*' replace />;
@@ -131,7 +134,7 @@ const Application = () => {
   return (
     <section className='application'>
       <div className='container'>
-        {status === 'APPROVED' ? (
+        {statusId === 'APPROVED' ? (
           <LoanMessage
             title='Wait for a decision on the application'
             text='The answer will come to your mail within 10 minutes'

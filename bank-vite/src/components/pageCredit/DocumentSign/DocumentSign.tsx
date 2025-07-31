@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
 import Form from '@/components/ui/FormComponent.tsx/Form';
 import pdfUrl from '@/assets/pdf/credit-card-offer.pdf';
 import fileImg from '@/assets/img/File.svg';
@@ -7,10 +7,12 @@ import Button from '@/components/ui/ButtonComponent/Button';
 import axios from 'axios';
 import './_documentSign.scss';
 import LoanMessage from '../LoanMessag/LoanMessage';
+import { TApplicationStatus } from '@/redux/slices/applicationSlice';
 
 const DocumentSign = () => {
   const { applicationId } = useParams();
-  const [isSent, setIsSent] = useState(false);
+  const [statusId, setStatusId] = useState<TApplicationStatus>('IDLE');
+  const [isValid, setIsValid] = useState<boolean | null>(null);
 
   const handleDownload = () => {
     const link = document.createElement('a');
@@ -24,16 +26,42 @@ const DocumentSign = () => {
 
     try {
       await axios.post(`http://localhost:8080/document/${applicationId}/sign`);
-      setIsSent(true);
+      setStatusId('SIGN_PENDING');
+
+      const key = `reduxState__${applicationId}`;
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const state = JSON.parse(raw);
+        state.application.status = 'SIGN_PENDING';
+        localStorage.setItem(key, JSON.stringify(state));
+      }
     } catch (error) {
       console.error('Ошибка при подписании документов:', error);
-    } finally {
     }
   };
 
+  useEffect(() => {
+    if (!applicationId) return;
+
+    const raw = localStorage.getItem(`reduxState__${applicationId}`);
+    if (raw) {
+      const state = JSON.parse(raw);
+      const currentStatus: TApplicationStatus = state.application?.status || 'IDLE';
+      setStatusId(currentStatus);
+
+      const allowedStatuses: TApplicationStatus[] = ['DOCS_FORMED', 'SIGN_PENDING'];
+      setIsValid(allowedStatuses.includes(currentStatus));
+    } else {
+      setIsValid(false);
+    }
+  }, [applicationId]);
+
+  if (isValid === null) return null;
+  if (!isValid) return <Navigate to='*' replace />;
+
   return (
     <>
-      {isSent ? (
+      {statusId === 'SIGN_PENDING' ? (
         <LoanMessage
           title='Documents have been successfully signed and sent for approval'
           text='Within 10 minutes you will be sent a PIN code to your email for confirmation'

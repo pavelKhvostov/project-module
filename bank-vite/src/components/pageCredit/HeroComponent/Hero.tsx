@@ -3,7 +3,6 @@ import './_credit-hero.scss';
 import Button from '@/components/ui/ButtonComponent/Button';
 import imgCard1 from '@/assets/img/card-1.jpg';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
-import { setOffers } from '@/redux/slices/offerSlices';
 import { RootState } from '@/redux/store/store';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -14,23 +13,20 @@ interface IHeroProps {
 
 const Hero: React.FC<IHeroProps> = ({ onApplyClick }) => {
   const offers = useSelector((state: RootState) => state.offers.offers);
-  const isSubmitted = useSelector((state: RootState) => state.offers.isSubmitted);
-  const selectedApplicationId = useSelector(
-    (state: RootState) => state.offers.selectedApplicationId,
-  );
+  const status = useSelector((state: RootState) => state.application.status);
+  const applicationId = useSelector((state: RootState) => state.application.applicationId);
 
   const [isAppIdValid, setIsAppIdValid] = useState(false);
 
   useEffect(() => {
-    const savedAppId = localStorage.getItem('SelectedAppId');
-    if (savedAppId && String(selectedApplicationId) === savedAppId) {
+    if (status === 'OFFER_SELECTED') {
       setIsAppIdValid(true);
     } else {
       setIsAppIdValid(false);
     }
-  }, [selectedApplicationId]);
+  }, [status]);
 
-  const buttonText = isSubmitted
+  const buttonText = isAppIdValid
     ? 'Continue registration'
     : offers.length > 0
       ? 'Choose an offer'
@@ -74,7 +70,7 @@ const Hero: React.FC<IHeroProps> = ({ onApplyClick }) => {
             </ul>
 
             {isAppIdValid ? (
-              <Link to={`/loan/${selectedApplicationId}`}>
+              <Link to={`/loan/${applicationId}`}>
                 <Button className='credit-hero__btn' onClick={onApplyClick}>
                   {buttonText}
                 </Button>

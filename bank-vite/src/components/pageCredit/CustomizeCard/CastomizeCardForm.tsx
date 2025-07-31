@@ -63,7 +63,6 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
     handleSubmit,
     formState: { errors },
     watch,
-    reset,
   } = methods;
 
   const renderIcon = (fieldName: keyof IFormValues) => {
@@ -99,7 +98,13 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
       if (applicationId) {
         dispatch(setApplicationId(applicationId));
         dispatch(setStatus('PRESCORING_SUCCESS'));
-        localStorage.setItem('SelectedAppId', JSON.stringify(applicationId));
+        const raw = localStorage.getItem('SelectedAppIds');
+        const ids: number[] = raw ? JSON.parse(raw) : [];
+
+        if (!ids.includes(applicationId)) {
+          ids.push(applicationId);
+          localStorage.setItem('SelectedAppIds', JSON.stringify(ids));
+        }
       }
 
       dispatch(setOffers(offers));
