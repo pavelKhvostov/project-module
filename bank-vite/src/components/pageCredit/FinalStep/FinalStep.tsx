@@ -1,12 +1,17 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import './_finalStep.scss';
 import finalImg from '@/assets/img/offer.png';
 import Button from '@/components/ui/ButtonComponent/Button';
+import { resetApplication } from '@/redux/slices/applicationSlice';
+import { clearOffers } from '@/redux/slices/offerSlices';
+import { resetScoring } from '@/redux/slices/scoringSlice';
 
 const FinalStep = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { applicationId } = useParams();
 
   const handleClick = () => {
@@ -14,13 +19,15 @@ const FinalStep = () => {
       const currentId = Number(applicationId);
 
       localStorage.removeItem(`reduxState__${currentId}`);
-
       const historyRaw = localStorage.getItem('SelectedAppIds');
       if (historyRaw) {
         const history: number[] = JSON.parse(historyRaw);
         const updated = history.filter((id) => id !== currentId);
         localStorage.setItem('SelectedAppIds', JSON.stringify(updated));
       }
+
+      dispatch(resetApplication());
+      dispatch(resetScoring());
     }
 
     navigate('/');
