@@ -6,7 +6,6 @@ import './_finalStep.scss';
 import finalImg from '@/assets/img/offer.png';
 import Button from '@/components/ui/ButtonComponent/Button';
 import { resetApplication } from '@/redux/slices/applicationSlice';
-import { clearOffers } from '@/redux/slices/offerSlices';
 import { resetScoring } from '@/redux/slices/scoringSlice';
 
 const FinalStep = () => {

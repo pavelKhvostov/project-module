@@ -134,7 +134,7 @@ const CustomizeCardForm = forwardRef<HTMLDivElement>((_, ref) => {
         {status === 'OFFER_SELECTED' ? (
           <Success />
         ) : offers.length > 0 ? (
-          <div className='customize-card__offer-wrap'>
+          <div className='customize-card__offer-wrap' data-testid='offers-container'>
             {offers
               .slice()
               .sort((a, b) => b.rate - a.rate || b.totalAmount - a.totalAmount)

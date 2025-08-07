@@ -22,6 +22,13 @@ export const store = configureStore({
   },
 });
 
+// для тестов
+export const getStore = () =>
+  configureStore({
+    reducer: rootReducer,
+    devTools: false,
+  });
+
 store.subscribe(() => {
   const currentState = store.getState();
   saveStateToLocalStorage(currentState);
