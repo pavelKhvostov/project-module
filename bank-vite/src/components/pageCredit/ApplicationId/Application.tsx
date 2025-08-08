@@ -132,7 +132,7 @@ const Application = () => {
   if (!isValid) return <Navigate to='*' replace />;
 
   return (
-    <section className='application'>
+    <section className='application' data-testid='application-form'>
       <div className='container'>
         {statusId === 'APPROVED' ? (
           <LoanMessage

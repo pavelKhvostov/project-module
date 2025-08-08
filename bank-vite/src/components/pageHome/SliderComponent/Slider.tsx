@@ -11,7 +11,6 @@ const Slider: React.FC<ISliderProps> = ({ articles }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleSlides, setVisibleSlides] = useState(1);
 
-  // Заглушка при отсутствии картинки
   const fallbackImage = 'http://dummyimage.com/120';
 
   const updateVisibleSlides = () => {

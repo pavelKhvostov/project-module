@@ -14,7 +14,6 @@ export interface IArticle {
 const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
 const PAGE_SIZE = 20;
 
-//Утилита для проверки валидности изображения
 const isValidImageUrl = (url: string | null | undefined): boolean => {
   if (!url) return false;
   try {
@@ -44,7 +43,7 @@ const News: React.FC = () => {
         let filteredArticles = (firstPageData.articles as IArticle[]).filter(
           (article) =>
             article.description &&
-            !/<[^>]*>/g.test(article.description) && // если нужно убрать HTML
+            !/<[^>]*>/g.test(article.description) &&
             isValidImageUrl(article.urlToImage),
         );
 

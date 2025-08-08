@@ -27,7 +27,7 @@ const ACCESS_KEY = import.meta.env.VITE_SERVICES_API_KEY;
 const FORCE_FETCH = import.meta.env.VITE_FORCE_FETCH_RATES === 'true';
 
 const CACHE_KEY = 'currency_rates_cache';
-const CACHE_TTL = 1000 * 60 * 14; // 15 минут
+const CACHE_TTL = 1000 * 60 * 14;
 
 const getExchangeRate = async (code: TCurrencyCode): Promise<ICurrencyRate | null> => {
   const url = `https://v6.exchangerate-api.com/v6/${ACCESS_KEY}/pair/${code}/RUB`;
@@ -107,11 +107,11 @@ const Services: React.FC<ServicesProps> = ({ currencyCodes }) => {
   };
 
   useEffect(() => {
-    loadRates(); // первая загрузка
+    loadRates();
 
     const intervalId = setInterval(
       () => {
-        loadRates(true); // обновление каждые 15 минут
+        loadRates(true);
       },
 
       15 * 60 * 1000,

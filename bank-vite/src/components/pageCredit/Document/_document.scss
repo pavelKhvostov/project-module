@@ -2,7 +2,7 @@
   padding-top: 24px;
   margin: 0 0 100px;
   &__table-wrap {
-    max-height: 300px; // высота для ~6 строк
+    max-height: 300px;
     overflow-y: auto;
     margin-bottom: 20px;
   }
