@@ -8,7 +8,7 @@ import errorSvg from '@/assets/img/Close_round_fill.svg';
 import checkSvg from '@/assets/img/Check_fill.svg';
 import Form from '@/components/ui/FormComponent.tsx/Form';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   IFormValues,
   resetScoring,
@@ -18,12 +18,14 @@ import {
 } from '@/redux/slices/scoringSlice';
 import { clearOffers } from '@/redux/slices/offerSlices';
 import { setStatus, TApplicationStatus } from '@/redux/slices/applicationSlice';
+import { RootState } from '@/redux/store/store';
 
 const Application = () => {
   const [dateInputType, setDateInputType] = useState<'text' | 'date'>('text');
   const { applicationId } = useParams();
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [statusId, setStatusId] = useState<TApplicationStatus>('IDLE');
+  const scoring = useSelector((state: RootState) => state.scoring);
 
   const dispatch = useDispatch();
 
@@ -221,22 +223,51 @@ const Application = () => {
                         placeholder='Select Date and Time'
                         {...register('passportIssueDate', {
                           required: 'Incorrect date of passport issue date',
-                          validate: (value) => {
-                            const date = new Date(value);
+                          validate: (passportDate) => {
+                            const issueDate = new Date(passportDate);
                             const now = new Date();
-                            return (
-                              (!isNaN(date.getTime()) && date <= now) ||
-                              'Incorrect date of passport issue date'
-                            );
+
+                            if (isNaN(issueDate.getTime())) {
+                              return 'Invalid date format';
+                            }
+
+                            if (issueDate > now) {
+                              return 'Passport cannot be issued in the future';
+                            }
+
+                            const birthdate = scoring.result?.client?.birthdate;
+
+                            if (!birthdate) {
+                              return 'Birth date is missing in application data';
+                            }
+
+                            const birthDate = new Date(birthdate);
+                            if (isNaN(birthDate.getTime())) {
+                              return 'Invalid birth date format';
+                            }
+
+                            if (issueDate < birthDate) {
+                              return 'Passport issue date cannot be before birth date';
+                            }
+
+                            const ageAtIssue = issueDate.getFullYear() - birthDate.getFullYear();
+                            const monthDiff = issueDate.getMonth() - birthDate.getMonth();
+                            const dayDiff = issueDate.getDate() - birthDate.getDate();
+
+                            const isAtLeast14 =
+                              ageAtIssue > 14 ||
+                              (ageAtIssue === 14 &&
+                                (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)));
+
+                            if (!isAtLeast14) {
+                              return 'You must be at least 14 years old to get a passport';
+                            }
+
+                            return true;
                           },
                         })}
                         onFocus={() => setDateInputType('date')}
-                        onBlur={(e) => {
-                          const originalBlur = register('passportIssueDate').onBlur;
-                          originalBlur && originalBlur(e);
-                          if (!e.target.value) setDateInputType('text');
-                        }}
-                        className='input-field__input'
+                        className={`input-field__input ${errors.passportIssueDate ? 'input-field__input--error' : ''}`}
                       />
                       {renderIcon('passportIssueDate')}
                     </div>

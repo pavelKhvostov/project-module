@@ -14,10 +14,15 @@ export interface IFormValues {
   workExperienceCurrent: number;
 }
 
+export interface IClientBirthdate {
+  birthdate: string;
+}
+
 export interface IScoringResult {
   status: string;
   psb?: number;
   paymentSchedule?: any[];
+  client?: IClientBirthdate;
 }
 
 export interface IScoringState {
