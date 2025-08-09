@@ -11,7 +11,7 @@ interface IModalProps {
 
 const Modal: React.FC<IModalProps> = ({ step, onClose, onConfirm, onGoHome }) => {
   return (
-    <div className='modal'>
+    <div className='modal' data-testid='deny-modal'>
       <div className='modal__content'>
         <h3 className='modal__title'>Deny application</h3>
         <button className='modal__close' onClick={onClose}>

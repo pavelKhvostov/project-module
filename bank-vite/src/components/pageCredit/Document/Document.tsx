@@ -18,8 +18,8 @@ type SortKey =
   | 'remainingDebt';
 
 const Document = () => {
-  const [statusId, setStatusId] = useState<TApplicationStatus>('IDLE');
   const [isDeleted, setIsDeleted] = useState(false);
+  const [statusId, setStatusId] = useState<TApplicationStatus>('IDLE');
   const [agree, setAgree] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('number');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -30,9 +30,8 @@ const Document = () => {
   const navigate = useNavigate();
   const { applicationId } = useParams();
 
-  if (isDeleted) return <Navigate to='/' replace />;
-
   const rawState = localStorage.getItem(`reduxState__${applicationId}`);
+
   if (!rawState) return <Navigate to='/' replace />;
 
   const state = JSON.parse(rawState);
@@ -123,6 +122,8 @@ const Document = () => {
       setIsValid(false);
     }
   }, [applicationId]);
+
+  if (isDeleted) return <Navigate to='/' replace />;
 
   if (isValid === null) return null;
 
