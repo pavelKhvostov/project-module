@@ -26,7 +26,7 @@ const renderApplication = () => {
   return { store, ...utils };
 };
 
-describe('Тесты формы Application', () => {
+describe('Компонент Application', () => {
   beforeEach(() => {
     localStorage.setItem(
       'reduxState__123',
