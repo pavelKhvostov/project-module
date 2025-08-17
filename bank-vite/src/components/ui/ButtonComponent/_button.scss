@@ -1,0 +1,17 @@
+.btn {
+  background-color: #003cff;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 112%;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background-color: #7796c0;
+  }
+}

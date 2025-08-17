@@ -1,0 +1,34 @@
+@use '@/globalScss/_mixins' as *;
+
+.notFound {
+  margin: 0 0 100px;
+  &__wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 24px;
+
+    @include vp-600 {
+      flex-direction: column;
+    }
+  }
+
+  &__not-found {
+    margin: 0 0 32px;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 112%;
+    color: #1c1c1e;
+  }
+
+  &__decr {
+    margin: 0 0 32px;
+    font-size: 16px;
+    line-height: 112%;
+    color: #4b4b4b;
+  }
+
+  &__button {
+    padding: 11px 64px;
+  }
+}

@@ -1,0 +1,69 @@
+@use '@/globalScss/_mixins' as *;
+
+.application {
+  padding-top: 24px;
+  margin: 0 0 100px;
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin: 0 0 72px;
+  }
+
+  &__field {
+    width: 100%;
+  }
+
+  &__top {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+
+    .application__field:nth-child(1) {
+      grid-column: span 2;
+    }
+
+    .application__field:nth-child(2) {
+      grid-column: span 2;
+    }
+
+    .application__field:nth-child(3) {
+      grid-column: span 2;
+    }
+
+    .application__field:nth-child(4) {
+      grid-column: span 3;
+    }
+
+    .application__field:nth-child(5) {
+      grid-column: span 3;
+    }
+
+    @include vp-1110 {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+
+  &__heading {
+    margin: 0;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+    color: #000000;
+  }
+
+  &__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .application__field {
+      max-width: 396px;
+
+      @include vp-1110 {
+        max-width: 100%;
+      }
+    }
+  }
+}

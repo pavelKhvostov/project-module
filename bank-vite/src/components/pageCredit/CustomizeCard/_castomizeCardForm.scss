@@ -1,0 +1,42 @@
+@use '@/globalScss/_mixins' as *;
+
+.customize-card {
+  margin: 0 0 100px;
+  &__title {
+    margin: 0 0 26px;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+    color: #000000;
+    padding-top: 32px;
+  }
+
+  &__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 0 0 68px;
+
+    @include vp-1110 {
+      justify-content: center;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 290px;
+  }
+
+  &__loader {
+    padding: 100px;
+  }
+
+  &__offer-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+  }
+}

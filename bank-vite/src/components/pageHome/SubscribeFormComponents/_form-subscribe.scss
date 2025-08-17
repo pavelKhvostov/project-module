@@ -1,0 +1,73 @@
+@use '@/globalScss/_mixins' as *;
+
+.form-subscribe {
+  margin: 0 auto;
+  max-width: 525px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  box-shadow: 0px 10px 20px rgba(54, 58, 120, 0.1);
+  border-radius: 20px;
+  padding: 23px 32px;
+  justify-content: space-between;
+
+  @include vp-500 {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__input {
+    border: none;
+
+    &::placeholder {
+      font-family: 'Nunito Sans';
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 147.4%;
+      letter-spacing: 0.02em;
+      color: #9092b0;
+    }
+
+    &--error {
+      outline: 1px solid #ff5631;
+    }
+  }
+
+  &__btn {
+    cursor: pointer;
+    padding: 7px 14px;
+    border: none;
+    background: #686df1;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    @include vp-500 {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  &__text {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 126.9%;
+    color: #ffffff;
+  }
+
+  &__confirmed {
+    text-align: center;
+  }
+
+  &__error {
+    color: #ff5631;
+  }
+}

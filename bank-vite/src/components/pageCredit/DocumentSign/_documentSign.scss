@@ -1,0 +1,32 @@
+.sign {
+  padding-top: 100px;
+  margin: 0 0 100px;
+
+  &__form {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  &__text {
+    margin: 0 0 32px;
+  }
+
+  &__card-btn {
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__button {
+    padding: 11px 60px;
+    border-radius: 8px;
+  }
+}

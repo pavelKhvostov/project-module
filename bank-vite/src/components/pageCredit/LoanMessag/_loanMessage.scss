@@ -1,0 +1,30 @@
+.message {
+  padding-top: 166px;
+  margin: 0 0 200px;
+  &__wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+    text-align: center;
+  }
+
+  &__title {
+    margin: 0;
+    max-width: 555px;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #1c1c1e;
+  }
+
+  &__text {
+    margin: 0;
+    max-width: 405px;
+    font-size: 16px;
+    line-height: 112%;
+    letter-spacing: 0.02em;
+    color: #4f5665;
+  }
+}

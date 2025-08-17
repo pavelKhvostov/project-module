@@ -1,10 +1,10 @@
 import React from 'react';
 
-import Hero from '@/components/HeroComponent/Hero';
-import Services from '@/components/ServicesComponent/Services';
-import Map from '@/components/MapComponent/Map';
-import News from '@/components/NewsComponent/News';
-import Support from '@/components/SupportComponent/Support';
+import Hero from '@/components/pageHome/HeroComponent/Hero';
+import Services from '@/components/pageHome/ServicesComponent/Services';
+import Map from '@/components/pageHome/MapComponent/Map';
+import News from '@/components/pageHome/NewsComponent/News';
+import Support from '@/components/pageHome/SupportComponent/Support';
 
 const Home: React.FC = () => {
   return (
