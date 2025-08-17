@@ -18,7 +18,7 @@ npm install
 
 Need to install docker and run the following command:
 
-docer compose -up --build
+docker-compose up --build
 
 # Run the development server
 
