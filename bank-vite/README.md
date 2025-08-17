@@ -14,6 +14,12 @@ NeoBank App is a responsive web application built with Vite and React. The core 
 
 npm install
 
+# Install DOCER
+
+Need to install docker and run the following command:
+
+docer compose -up --build
+
 # Run the development server
 
 npm run dev
@@ -21,3 +27,7 @@ npm run dev
 # Build for production
 
 npm run build
+
+# Tests
+
+npm run test
